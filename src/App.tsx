@@ -15,31 +15,22 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoutes() {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">Lädt...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  return (
-    <AppLayout>
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/leads" element={<LeadsPage />} />
-        <Route path="/leads/:id" element={<LeadDetail />} />
-        <Route path="/kalender" element={<KalenderPage />} />
-        <Route path="/einstellungen" element={<EinstellungenPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </AppLayout>
-  );
-}
-
 function AppRoutes() {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">Lädt...</div>;
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route path="/*" element={<ProtectedRoutes />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/*" element={
+        <AppLayout>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/leads" element={<LeadsPage />} />
+            <Route path="/leads/:id" element={<LeadDetail />} />
+            <Route path="/kalender" element={<KalenderPage />} />
+            <Route path="/einstellungen" element={<EinstellungenPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AppLayout>
+      } />
     </Routes>
   );
 }
