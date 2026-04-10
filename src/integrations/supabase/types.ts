@@ -14,7 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      aktivitaeten: {
+        Row: {
+          beschreibung: string | null
+          created_at: string
+          erstellt_von: string | null
+          id: string
+          lead_id: string
+          typ: string
+        }
+        Insert: {
+          beschreibung?: string | null
+          created_at?: string
+          erstellt_von?: string | null
+          id?: string
+          lead_id: string
+          typ: string
+        }
+        Update: {
+          beschreibung?: string | null
+          created_at?: string
+          erstellt_von?: string | null
+          id?: string
+          lead_id?: string
+          typ?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aktivitaeten_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      einstellungen: {
+        Row: {
+          id: string
+          schluessel: string
+          wert: string | null
+        }
+        Insert: {
+          id?: string
+          schluessel: string
+          wert?: string | null
+        }
+        Update: {
+          id?: string
+          schluessel?: string
+          wert?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          branche: string | null
+          created_at: string
+          email: string | null
+          entwicklung: string | null
+          id: string
+          kontaktiert_am: string | null
+          mandats_wert: number | null
+          mitarbeiter: string | null
+          nachname: string
+          notizen: string | null
+          prioritaet: string
+          quelle: string | null
+          rechner_ergebnis: number | null
+          status: string
+          telefon: string | null
+          termin_am: string | null
+          unternehmen: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          vorname: string
+          zugewiesen_an: string | null
+        }
+        Insert: {
+          branche?: string | null
+          created_at?: string
+          email?: string | null
+          entwicklung?: string | null
+          id?: string
+          kontaktiert_am?: string | null
+          mandats_wert?: number | null
+          mitarbeiter?: string | null
+          nachname: string
+          notizen?: string | null
+          prioritaet?: string
+          quelle?: string | null
+          rechner_ergebnis?: number | null
+          status?: string
+          telefon?: string | null
+          termin_am?: string | null
+          unternehmen?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          vorname: string
+          zugewiesen_an?: string | null
+        }
+        Update: {
+          branche?: string | null
+          created_at?: string
+          email?: string | null
+          entwicklung?: string | null
+          id?: string
+          kontaktiert_am?: string | null
+          mandats_wert?: number | null
+          mitarbeiter?: string | null
+          nachname?: string
+          notizen?: string | null
+          prioritaet?: string
+          quelle?: string | null
+          rechner_ergebnis?: number | null
+          status?: string
+          telefon?: string | null
+          termin_am?: string | null
+          unternehmen?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          vorname?: string
+          zugewiesen_an?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
