@@ -8,14 +8,36 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { LEAD_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, formatCurrency, formatDateTime } from '@/lib/constants';
+import { LEAD_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 const ICON_MAP: Record<string, React.ElementType> = {
-  'Anruf': PhoneCall, 'E-Mail': MailIcon, 'Notiz': FileText, 'Statusänderung': RotateCcw, 'Termin': Calendar,
+  'Anruf': PhoneCall, 'E-Mail': MailIcon, 'Notiz': FileText, 'Statusänderung': RotateCcw, 'Termin': Calendar, 'Fragenkatalog': FileText,
 };
+
+function BoolField({ label, field, value, onUpdate }: { label: string; field: string; value: boolean | null; onUpdate: (field: string, value: boolean | null) => void }) {
+  return (
+    <div className="flex items-start justify-between gap-2">
+      <p className="text-xs text-muted-foreground flex-1">{label}</p>
+      <div className="flex gap-1 shrink-0">
+        <button
+          onClick={() => onUpdate(field, true)}
+          className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${value === true ? 'bg-green-500/20 text-green-500' : 'bg-muted text-muted-foreground hover:bg-accent'}`}
+        >
+          Ja
+        </button>
+        <button
+          onClick={() => onUpdate(field, false)}
+          className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${value === false ? 'bg-red-500/20 text-red-500' : 'bg-muted text-muted-foreground hover:bg-accent'}`}
+        >
+          Nein
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function LeadDetail() {
   const { id } = useParams();
@@ -184,6 +206,19 @@ export default function LeadDetail() {
               <InlineField label="E-Mail" field="email" value={lead.email} type="email" />
               <InlineField label="Telefon" field="telefon" value={lead.telefon} />
               <InlineField label="Unternehmen" field="unternehmen" value={lead.unternehmen} />
+              <InlineField label="Position" field="position_titel" value={lead.position_titel} />
+              <InlineField label="Adresse" field="adresse" value={lead.adresse} />
+              <div className="grid grid-cols-2 gap-2">
+                <InlineField label="PLZ" field="plz" value={lead.plz} />
+                <InlineField label="Ort" field="ort" value={lead.ort} />
+              </div>
+              {lead.homepage && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Homepage</p>
+                  <a href={lead.homepage.startsWith('http') ? lead.homepage : `https://${lead.homepage}`} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">{lead.homepage}</a>
+                </div>
+              )}
+              {!lead.homepage && <InlineField label="Homepage" field="homepage" value={lead.homepage} />}
             </CardContent>
           </Card>
 
@@ -227,6 +262,108 @@ export default function LeadDetail() {
           </Card>
         </div>
       </div>
+
+      {/* Ersteinschätzungs-Fragenkatalog */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">Ersteinschätzung — Fragenkatalog</CardTitle>
+            {(() => {
+              const ff = berechneFoerderfaehigkeit(lead);
+              const info = FOERDERFAEHIGKEIT_LABELS[ff];
+              return (
+                <span className={`text-sm font-medium ${info.color}`}>
+                  {ff === 'gruen' && '🟢'}{ff === 'gelb' && '🟡'}{ff === 'rot' && '🔴'}{ff === 'unbekannt' && '⚪'} {info.label}
+                </span>
+              );
+            })()}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <BoolField label="Ist das Unternehmen in Deutschland steuerpflichtig?" field="steuerpflichtig_de" value={lead.steuerpflichtig_de} onUpdate={handleInlineEdit} />
+              <BoolField label="Ist das Unternehmen in Schwierigkeiten? (mind. halbes EK aufgebraucht)" field="unternehmen_schwierigkeiten" value={lead.unternehmen_schwierigkeiten} onUpdate={handleInlineEdit} />
+              <BoolField label="Gibt es verbundene Unternehmen (Konzernstruktur)?" field="verbundene_unternehmen" value={lead.verbundene_unternehmen} onUpdate={handleInlineEdit} />
+              <BoolField label="Handelt es sich um eine reine Produktentwicklung?" field="reine_produktentwicklung" value={lead.reine_produktentwicklung} onUpdate={handleInlineEdit} />
+              <BoolField label="Bestehen wissenschaftliche/methodische Risiken?" field="wissenschaftliche_risiken" value={lead.wissenschaftliche_risiken} onUpdate={handleInlineEdit} />
+              <BoolField label="Arbeiten Auftragnehmer mit (nicht routinemäßig)?" field="auftragnehmer_beteiligt" value={lead.auftragnehmer_beteiligt} onUpdate={handleInlineEdit} />
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Herausforderungen der Entwicklung</p>
+                <Textarea
+                  value={lead.entwicklung_herausforderungen || ''}
+                  placeholder="Welche Herausforderungen sollen bewältigt werden?"
+                  rows={3}
+                  className="text-sm"
+                  onBlur={e => { if (e.target.value !== (lead.entwicklung_herausforderungen || '')) handleInlineEdit('entwicklung_herausforderungen', e.target.value || null); }}
+                  onChange={() => {}}
+                  defaultValue={lead.entwicklung_herausforderungen || ''}
+                />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Entwicklungsplan / Meilensteine</p>
+                <Textarea
+                  value={lead.entwicklungsplan || ''}
+                  placeholder="Arbeitsplan, Meilensteine..."
+                  rows={2}
+                  className="text-sm"
+                  onBlur={e => { if (e.target.value !== (lead.entwicklungsplan || '')) handleInlineEdit('entwicklungsplan', e.target.value || null); }}
+                  onChange={() => {}}
+                  defaultValue={lead.entwicklungsplan || ''}
+                />
+              </div>
+              {lead.auftragnehmer_beteiligt && (
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Aufgabe der Auftragnehmer</p>
+                  <Textarea
+                    placeholder="Was ist die Aufgabenstellung?"
+                    rows={2}
+                    className="text-sm"
+                    onBlur={e => { if (e.target.value !== (lead.auftragnehmer_aufgabe || '')) handleInlineEdit('auftragnehmer_aufgabe', e.target.value || null); }}
+                    onChange={() => {}}
+                    defaultValue={lead.auftragnehmer_aufgabe || ''}
+                  />
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Entwicklungsaufwand (letzte 4 Jahre)</p>
+                <Select value={lead.entwicklungsaufwand_4j || ''} onValueChange={v => handleInlineEdit('entwicklungsaufwand_4j', v)}>
+                  <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
+                  <SelectContent>
+                    {ENTWICKLUNGSAUFWAND_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Mitarbeiter in Entwicklung eingesetzt</p>
+                <Select value={lead.ma_in_entwicklung || ''} onValueChange={v => handleInlineEdit('ma_in_entwicklung', v)}>
+                  <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
+                  <SelectContent>
+                    {MA_ENTWICKLUNG_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notizen */}
+      <Card>
+        <CardHeader className="pb-2"><CardTitle className="text-sm">Notizen</CardTitle></CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Freitext-Notizen..."
+            rows={4}
+            className="text-sm"
+            onBlur={e => { if (e.target.value !== (lead.notizen || '')) handleInlineEdit('notizen', e.target.value || null); }}
+            onChange={() => {}}
+            defaultValue={lead.notizen || ''}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

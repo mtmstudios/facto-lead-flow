@@ -99,8 +99,10 @@
 
 /* Status badge colors */
 .status-neu { @apply bg-primary/15 text-primary; }
+.status-mail-gesendet { @apply bg-sky-500/15 text-sky-500; }
 .status-kontaktiert { @apply bg-warning/15 text-warning; }
 .status-termin { @apply bg-orange-500/15 text-orange-500; }
+.status-fragenkatalog { @apply bg-indigo-500/15 text-indigo-500; }
 .status-qualifiziert { @apply bg-purple-500/15 text-purple-500; }
 .status-mandat { @apply bg-success/15 text-success; }
 .status-kalt { @apply bg-muted text-muted-foreground; }

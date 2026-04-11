@@ -11,6 +11,7 @@ import LeadsPage from "@/pages/Leads";
 import LeadDetail from "@/pages/LeadDetail";
 import KalenderPage from "@/pages/Kalender";
 import EinstellungenPage from "@/pages/Einstellungen";
+import PipelinePage from "@/pages/Pipeline";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function AppRoutes() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/leads" element={<LeadsPage />} />
             <Route path="/leads/:id" element={<LeadDetail />} />
+            <Route path="/pipeline" element={<PipelinePage />} />
             <Route path="/kalender" element={<KalenderPage />} />
             <Route path="/einstellungen" element={<EinstellungenPage />} />
             <Route path="*" element={<NotFound />} />
