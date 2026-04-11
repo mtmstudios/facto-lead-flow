@@ -1,0 +1,26 @@
+
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS adresse TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS plz TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS ort TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS position_titel TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS homepage TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS reminder_count INTEGER DEFAULT 0;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS letzter_kontakt TIMESTAMPTZ;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS naechster_kontakt TIMESTAMPTZ;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS steuerpflichtig_de BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS unternehmen_schwierigkeiten BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS verbundene_unternehmen BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS entwicklung_herausforderungen TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS reine_produktentwicklung BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS wissenschaftliche_risiken BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS entwicklungsplan TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS auftragnehmer_beteiligt BOOLEAN;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS auftragnehmer_aufgabe TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS entwicklungsaufwand_4j TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS ma_in_entwicklung TEXT;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS foerderfaehigkeit TEXT DEFAULT 'unbekannt';
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS foerdersumme_genehmigt NUMERIC;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS revenue_share_pca NUMERIC;
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS revenue_share_mtm NUMERIC;
+CREATE INDEX IF NOT EXISTS idx_leads_naechster_kontakt ON leads(naechster_kontakt);
+CREATE INDEX IF NOT EXISTS idx_leads_foerderfaehigkeit ON leads(foerderfaehigkeit);
