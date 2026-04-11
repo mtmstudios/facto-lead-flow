@@ -1,0 +1,1 @@
+CREATE POLICY "Anon can read leads" ON leads FOR SELECT TO anon USING (true);
