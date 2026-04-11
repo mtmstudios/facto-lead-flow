@@ -1,20 +1,31 @@
-export const LEAD_STATUSES = ['Neu', 'Kontaktiert', 'Termin', 'Qualifiziert', 'Mandat', 'Kalt', 'Disqualifiziert'] as const;
-export const LEAD_QUELLEN = ['Meta Ads', 'Google Ads', 'Organic', 'Manuell'] as const;
+export const LEAD_STATUSES = [
+  'Neu', 'Mail gesendet', 'Kontaktiert', 'Erstgespräch geplant', 'Erstgespräch durchgeführt',
+  'Fragenkatalog gesendet', 'Fragenkatalog beantwortet', 'Qualifiziert', 'Mandat',
+  'Kalt', 'Nicht förderfähig', 'Disqualifiziert'
+] as const;
+export const LEAD_QUELLEN = ['Meta Ads', 'Google Ads', 'Organic', 'Funnel', 'Kaltakquise', 'Empfehlung', 'Event', 'Manuell'] as const;
 export const LEAD_PRIORITAETEN = ['Hoch', 'Mittel', 'Niedrig'] as const;
 export const MITARBEITER_OPTIONS = ['Bis 9', '10–49', '50–249', '250+'] as const;
 export const ENTWICKLUNG_OPTIONS = ['Ja, regelmäßig', 'Ja, gelegentlich', 'Nein / Unsicher'] as const;
-export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 'Termin'] as const;
+export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 'Termin', 'Fragenkatalog'] as const;
+export const ENTWICKLUNGSAUFWAND_OPTIONS = ['unter 100.000 EUR', '100.000 – 400.000 EUR', '400.000 – 1.000.000 EUR', 'über 1.000.000 EUR'] as const;
+export const MA_ENTWICKLUNG_OPTIONS = ['1', '2–5', '6–10', 'mehr als 10'] as const;
 
 export type LeadStatus = typeof LEAD_STATUSES[number];
 export type LeadPrioritaet = typeof LEAD_PRIORITAETEN[number];
 
 export const STATUS_CLASSES: Record<string, string> = {
   'Neu': 'status-neu',
+  'Mail gesendet': 'status-mail-gesendet',
   'Kontaktiert': 'status-kontaktiert',
-  'Termin': 'status-termin',
+  'Erstgespräch geplant': 'status-termin',
+  'Erstgespräch durchgeführt': 'status-termin',
+  'Fragenkatalog gesendet': 'status-fragenkatalog',
+  'Fragenkatalog beantwortet': 'status-fragenkatalog',
   'Qualifiziert': 'status-qualifiziert',
   'Mandat': 'status-mandat',
   'Kalt': 'status-kalt',
+  'Nicht förderfähig': 'status-disqualifiziert',
   'Disqualifiziert': 'status-disqualifiziert',
 };
 
@@ -69,3 +80,35 @@ export function isOverdue(lead: { status: string; created_at: string }): boolean
   const now = new Date();
   return (now.getTime() - created.getTime()) > 4 * 3600000;
 }
+
+export type Foerderfaehigkeit = 'gruen' | 'gelb' | 'rot' | 'unbekannt';
+
+export function berechneFoerderfaehigkeit(lead: {
+  steuerpflichtig_de?: boolean | null;
+  unternehmen_schwierigkeiten?: boolean | null;
+  reine_produktentwicklung?: boolean | null;
+  wissenschaftliche_risiken?: boolean | null;
+}): Foerderfaehigkeit {
+  const { steuerpflichtig_de, unternehmen_schwierigkeiten, reine_produktentwicklung, wissenschaftliche_risiken } = lead;
+
+  if (steuerpflichtig_de == null && unternehmen_schwierigkeiten == null &&
+      reine_produktentwicklung == null && wissenschaftliche_risiken == null) {
+    return 'unbekannt';
+  }
+
+  if (unternehmen_schwierigkeiten === true || steuerpflichtig_de === false) return 'rot';
+
+  if (steuerpflichtig_de === true && unternehmen_schwierigkeiten === false &&
+      reine_produktentwicklung === false && wissenschaftliche_risiken === true) {
+    return 'gruen';
+  }
+
+  return 'gelb';
+}
+
+export const FOERDERFAEHIGKEIT_LABELS: Record<Foerderfaehigkeit, { label: string; color: string }> = {
+  gruen: { label: 'Wahrscheinlich förderfähig', color: 'text-green-500' },
+  gelb: { label: 'Prüfung erforderlich', color: 'text-yellow-500' },
+  rot: { label: 'Nicht förderfähig', color: 'text-red-500' },
+  unbekannt: { label: 'Noch nicht bewertet', color: 'text-muted-foreground' },
+};

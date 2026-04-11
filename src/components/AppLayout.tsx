@@ -2,13 +2,14 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Settings, LogOut, ChevronLeft, ChevronRight, Sun, Moon, Kanban } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/leads', icon: Users, label: 'Leads' },
+  { to: '/pipeline', icon: Kanban, label: 'Pipeline' },
   { to: '/kalender', icon: Calendar, label: 'Kalender' },
   { to: '/einstellungen', icon: Settings, label: 'Einstellungen' },
 ];

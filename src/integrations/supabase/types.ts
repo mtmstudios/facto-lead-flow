@@ -69,81 +69,150 @@ export type Database = {
       }
       leads: {
         Row: {
+          adresse: string | null
+          auftragnehmer_aufgabe: string | null
+          auftragnehmer_beteiligt: boolean | null
           branche: string | null
           created_at: string
           email: string | null
           entwicklung: string | null
+          entwicklung_herausforderungen: string | null
+          entwicklungsaufwand_4j: string | null
+          entwicklungsplan: string | null
+          foerderfaehigkeit: string | null
+          foerdersumme_genehmigt: number | null
+          homepage: string | null
           id: string
           kontaktiert_am: string | null
+          letzter_kontakt: string | null
+          ma_in_entwicklung: string | null
           mandats_wert: number | null
           mitarbeiter: string | null
           nachname: string
+          naechster_kontakt: string | null
           notizen: string | null
+          ort: string | null
+          plz: string | null
+          position_titel: string | null
           prioritaet: string
           quelle: string | null
           rechner_ergebnis: number | null
+          reine_produktentwicklung: boolean | null
+          reminder_count: number | null
+          revenue_share_mtm: number | null
+          revenue_share_pca: number | null
           status: string
+          steuerpflichtig_de: boolean | null
           telefon: string | null
           termin_am: string | null
           unternehmen: string | null
+          unternehmen_schwierigkeiten: boolean | null
           updated_at: string
           utm_campaign: string | null
           utm_content: string | null
           utm_medium: string | null
           utm_source: string | null
+          verbundene_unternehmen: boolean | null
           vorname: string
+          wissenschaftliche_risiken: boolean | null
           zugewiesen_an: string | null
         }
         Insert: {
+          adresse?: string | null
+          auftragnehmer_aufgabe?: string | null
+          auftragnehmer_beteiligt?: boolean | null
           branche?: string | null
           created_at?: string
           email?: string | null
           entwicklung?: string | null
+          entwicklung_herausforderungen?: string | null
+          entwicklungsaufwand_4j?: string | null
+          entwicklungsplan?: string | null
+          foerderfaehigkeit?: string | null
+          foerdersumme_genehmigt?: number | null
+          homepage?: string | null
           id?: string
           kontaktiert_am?: string | null
+          letzter_kontakt?: string | null
+          ma_in_entwicklung?: string | null
           mandats_wert?: number | null
           mitarbeiter?: string | null
           nachname: string
+          naechster_kontakt?: string | null
           notizen?: string | null
+          ort?: string | null
+          plz?: string | null
+          position_titel?: string | null
           prioritaet?: string
           quelle?: string | null
           rechner_ergebnis?: number | null
+          reine_produktentwicklung?: boolean | null
+          reminder_count?: number | null
+          revenue_share_mtm?: number | null
+          revenue_share_pca?: number | null
           status?: string
+          steuerpflichtig_de?: boolean | null
           telefon?: string | null
           termin_am?: string | null
           unternehmen?: string | null
+          unternehmen_schwierigkeiten?: boolean | null
           updated_at?: string
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          verbundene_unternehmen?: boolean | null
           vorname: string
+          wissenschaftliche_risiken?: boolean | null
           zugewiesen_an?: string | null
         }
         Update: {
+          adresse?: string | null
+          auftragnehmer_aufgabe?: string | null
+          auftragnehmer_beteiligt?: boolean | null
           branche?: string | null
           created_at?: string
           email?: string | null
           entwicklung?: string | null
+          entwicklung_herausforderungen?: string | null
+          entwicklungsaufwand_4j?: string | null
+          entwicklungsplan?: string | null
+          foerderfaehigkeit?: string | null
+          foerdersumme_genehmigt?: number | null
+          homepage?: string | null
           id?: string
           kontaktiert_am?: string | null
+          letzter_kontakt?: string | null
+          ma_in_entwicklung?: string | null
           mandats_wert?: number | null
           mitarbeiter?: string | null
           nachname?: string
+          naechster_kontakt?: string | null
           notizen?: string | null
+          ort?: string | null
+          plz?: string | null
+          position_titel?: string | null
           prioritaet?: string
           quelle?: string | null
           rechner_ergebnis?: number | null
+          reine_produktentwicklung?: boolean | null
+          reminder_count?: number | null
+          revenue_share_mtm?: number | null
+          revenue_share_pca?: number | null
           status?: string
+          steuerpflichtig_de?: boolean | null
           telefon?: string | null
           termin_am?: string | null
           unternehmen?: string | null
+          unternehmen_schwierigkeiten?: boolean | null
           updated_at?: string
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+          verbundene_unternehmen?: boolean | null
           vorname?: string
+          wissenschaftliche_risiken?: boolean | null
           zugewiesen_an?: string | null
         }
         Relationships: []
