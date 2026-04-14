@@ -74,6 +74,31 @@ export default function LeadDetail() {
   const [editField, setEditField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
+  const ff = lead ? berechneFoerderfaehigkeit(lead) : 'unbekannt' as Foerderfaehigkeit;
+  const ffInfo = FOERDERFAEHIGKEIT_LABELS[ff];
+
+  const leadScore = useMemo(() => {
+    if (!lead) return 0;
+    let score = 0;
+    if (lead.email) score += 10;
+    if (lead.telefon) score += 10;
+    if (lead.unternehmen) score += 8;
+    if (lead.mitarbeiter) score += 8;
+    if (lead.entwicklung) score += 8;
+    if (lead.rechner_ergebnis && lead.rechner_ergebnis > 0) score += 12;
+    if (lead.steuerpflichtig_de !== null) score += 6;
+    if (lead.unternehmen_schwierigkeiten !== null) score += 6;
+    if (lead.wissenschaftliche_risiken !== null) score += 6;
+    if (lead.reine_produktentwicklung !== null) score += 6;
+    if (ff === 'gruen') score += 20;
+    else if (ff === 'gelb') score += 10;
+    if (lead.status === 'Mandat') score = 100;
+    else if (lead.status === 'Qualifiziert') score = Math.max(score, 85);
+    return Math.min(score, 100);
+  }, [lead, ff]);
+
+  const scoreColor = leadScore >= 70 ? '#22C55E' : leadScore >= 40 ? '#F59E0B' : '#EF4444';
+
   if (isLoading || !lead) {
     return (
       <div className="space-y-6">
@@ -91,7 +116,6 @@ export default function LeadDetail() {
       </div>
     );
   }
-
   const handleStatusChange = (status: string) => {
     const oldStatus = lead.status;
     updateLead.mutate({ id: lead.id, status });
