@@ -175,30 +175,7 @@ export default function LeadDetail() {
     );
   };
 
-  const ff = berechneFoerderfaehigkeit(lead);
-  const ffInfo = FOERDERFAEHIGKEIT_LABELS[ff];
 
-  // Lead Score: 0-100 based on filled fields + qualification
-  const leadScore = useMemo(() => {
-    let score = 0;
-    if (lead.email) score += 10;
-    if (lead.telefon) score += 10;
-    if (lead.unternehmen) score += 8;
-    if (lead.mitarbeiter) score += 8;
-    if (lead.entwicklung) score += 8;
-    if (lead.rechner_ergebnis && lead.rechner_ergebnis > 0) score += 12;
-    if (lead.steuerpflichtig_de !== null) score += 6;
-    if (lead.unternehmen_schwierigkeiten !== null) score += 6;
-    if (lead.wissenschaftliche_risiken !== null) score += 6;
-    if (lead.reine_produktentwicklung !== null) score += 6;
-    if (ff === 'gruen') score += 20;
-    else if (ff === 'gelb') score += 10;
-    if (lead.status === 'Mandat') score = 100;
-    else if (lead.status === 'Qualifiziert') score = Math.max(score, 85);
-    return Math.min(score, 100);
-  }, [lead, ff]);
-
-  const scoreColor = leadScore >= 70 ? '#22C55E' : leadScore >= 40 ? '#F59E0B' : '#EF4444';
 
   return (
     <motion.div
