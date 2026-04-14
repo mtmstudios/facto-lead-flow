@@ -104,7 +104,7 @@ export default function LeadDetail() {
     setAktBeschreibung('');
   };
 
-  const handleInlineEdit = (field: string, value: string | number | null) => {
+  const handleInlineEdit = (field: string, value: string | number | boolean | null) => {
     updateLead.mutate({ id: lead.id, [field]: value });
     setEditField(null);
   };
