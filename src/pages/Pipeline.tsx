@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   DndContext,
   DragOverlay,
-  closestCenter,
+  pointerWithin,
   PointerSensor,
   TouchSensor,
   useSensor,
@@ -57,16 +57,16 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
 
   return (
     <div ref={setNodeRef} style={style} className="group">
-      <div className={`lead-card p-3 space-y-2.5 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}>
+      <div
+        className={`lead-card p-3 space-y-2.5 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}
+        {...listeners}
+        {...attributes}
+      >
         {/* Drag Handle + Name */}
         <div className="flex items-start gap-2">
-          <button
-            {...listeners}
-            {...attributes}
-            className="mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing shrink-0 text-muted-foreground hover:text-foreground"
-          >
+          <div className="mt-0.5 opacity-0 group-hover:opacity-100 md:transition-opacity shrink-0 text-muted-foreground hidden md:block">
             <GripVertical className="h-3.5 w-3.5" />
-          </button>
+          </div>
           <div className="flex-1 min-w-0" onClick={() => navigate(`/leads/${lead.id}`)}>
             <div className="flex items-start justify-between gap-1">
               <div className="min-w-0">
@@ -241,6 +241,20 @@ export default function PipelinePage() {
     [leads]
   );
 
+  // Conversion rates between columns — must be before early return (Rules of Hooks)
+  const conversionRates = useMemo(() => {
+    const rates: Record<string, number> = {};
+    for (let i = 1; i < columns.length; i++) {
+      const curr = columns[i];
+      const atOrPast = PIPELINE_STATUSES.slice(i);
+      const atOrPastPrev = PIPELINE_STATUSES.slice(i - 1);
+      const countPrev = leads.filter(l => atOrPastPrev.includes(l.status)).length;
+      const countCurr = leads.filter(l => atOrPast.includes(l.status)).length;
+      rates[curr.status] = countPrev > 0 ? Math.round((countCurr / countPrev) * 100) : 0;
+    }
+    return rates;
+  }, [columns, leads]);
+
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
   };
@@ -269,22 +283,6 @@ export default function PipelinePage() {
       </div>
     );
   }
-
-  // Conversion rates between columns
-  const conversionRates = useMemo(() => {
-    const rates: Record<string, number> = {};
-    for (let i = 1; i < columns.length; i++) {
-      const prev = columns[i - 1];
-      const curr = columns[i];
-      // Count leads at this stage or further
-      const atOrPast = PIPELINE_STATUSES.slice(i);
-      const atOrPastPrev = PIPELINE_STATUSES.slice(i - 1);
-      const countPrev = leads.filter(l => atOrPastPrev.includes(l.status)).length;
-      const countCurr = leads.filter(l => atOrPast.includes(l.status)).length;
-      rates[curr.status] = countPrev > 0 ? Math.round((countCurr / countPrev) * 100) : 0;
-    }
-    return rates;
-  }, [columns, leads]);
 
   return (
     <div className="space-y-4 md:space-y-5">
@@ -325,7 +323,7 @@ export default function PipelinePage() {
       {/* Pipeline Board */}
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={pointerWithin}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
