@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { LEAD_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Tag, Clock, CheckCircle2, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
 
@@ -154,33 +154,69 @@ export default function LeadDetail() {
   const ff = berechneFoerderfaehigkeit(lead);
   const ffInfo = FOERDERFAEHIGKEIT_LABELS[ff];
 
+  // Lead Score: 0-100 based on filled fields + qualification
+  const leadScore = useMemo(() => {
+    let score = 0;
+    if (lead.email) score += 10;
+    if (lead.telefon) score += 10;
+    if (lead.unternehmen) score += 8;
+    if (lead.mitarbeiter) score += 8;
+    if (lead.entwicklung) score += 8;
+    if (lead.rechner_ergebnis && lead.rechner_ergebnis > 0) score += 12;
+    if (lead.steuerpflichtig_de !== null) score += 6;
+    if (lead.unternehmen_schwierigkeiten !== null) score += 6;
+    if (lead.wissenschaftliche_risiken !== null) score += 6;
+    if (lead.reine_produktentwicklung !== null) score += 6;
+    if (ff === 'gruen') score += 20;
+    else if (ff === 'gelb') score += 10;
+    if (lead.status === 'Mandat') score = 100;
+    else if (lead.status === 'Qualifiziert') score = Math.max(score, 85);
+    return Math.min(score, 100);
+  }, [lead, ff]);
+
+  const scoreColor = leadScore >= 70 ? '#22C55E' : leadScore >= 40 ? '#F59E0B' : '#EF4444';
+
   return (
     <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-5 md:space-y-6"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-9 w-9 rounded-lg">
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <div className="flex items-start gap-3 md:gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-8 w-8 md:h-9 md:w-9 rounded-lg shrink-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-sm font-bold text-primary ring-1 ring-primary/10">
-                {lead.vorname[0]}{lead.nachname[0]}
+              {/* Lead Score Ring */}
+              <div className="relative h-12 w-12 md:h-14 md:w-14 shrink-0">
+                <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
+                  <circle
+                    cx="18" cy="18" r="15.5" fill="none"
+                    stroke={scoreColor}
+                    strokeWidth="2.5"
+                    strokeDasharray={`${leadScore} ${100 - leadScore}`}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-[11px] md:text-xs font-bold" style={{ color: scoreColor }}>{leadScore}</span>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">{lead.vorname} {lead.nachname}</h1>
-                <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                  <Building2 className="h-3.5 w-3.5" />
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl font-bold tracking-tight truncate">{lead.vorname} {lead.nachname}</h1>
+                <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
+                  <Building2 className="h-3.5 w-3.5 shrink-0" />
                   {lead.unternehmen || 'Kein Unternehmen'}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-3">
+            <div className="flex items-center gap-2 mt-3 flex-wrap">
               <DropdownMenu>
                 <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
                 <DropdownMenuContent>{LEAD_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
@@ -201,20 +237,20 @@ export default function LeadDetail() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-11 md:ml-0">
           {lead.telefon && (
-            <Button variant="outline" size="sm" asChild className="h-9">
-              <a href={`tel:${lead.telefon}`}><Phone className="h-3.5 w-3.5 mr-1.5" />Anrufen</a>
+            <Button variant="outline" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm">
+              <a href={`tel:${lead.telefon}`}><Phone className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
             </Button>
           )}
           {lead.email && (
-            <Button variant="outline" size="sm" asChild className="h-9">
-              <a href={`mailto:${lead.email}`}><Mail className="h-3.5 w-3.5 mr-1.5" />E-Mail</a>
+            <Button variant="outline" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm">
+              <a href={`mailto:${lead.email}`}><Mail className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
             </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" className="h-9"><Trash2 className="h-3.5 w-3.5 mr-1.5" />Löschen</Button>
+              <Button variant="destructive" size="sm" className="h-8 md:h-9 text-xs md:text-sm"><Trash2 className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">Löschen</span></Button>
             </AlertDialogTrigger>
             <AlertDialogContent className="glass-card">
               <AlertDialogHeader>
@@ -230,10 +266,11 @@ export default function LeadDetail() {
         </div>
       </motion.div>
 
-      {/* Two Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* Two Columns — stacks on mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
+        {/* On mobile: Info cards first, then timeline */}
         {/* Timeline Column */}
-        <div className="lg:col-span-3 space-y-5">
+        <div className="lg:col-span-3 space-y-4 md:space-y-5 order-2 lg:order-1">
           {/* Add Activity */}
           <motion.div variants={itemVariants}>
             <Card className="glass-card">
@@ -314,8 +351,8 @@ export default function LeadDetail() {
           </motion.div>
         </div>
 
-        {/* Info Cards Column */}
-        <div className="lg:col-span-2 space-y-5">
+        {/* Info Cards Column — shows first on mobile */}
+        <div className="lg:col-span-2 space-y-4 md:space-y-5 order-1 lg:order-2">
           {/* Contact Data */}
           <motion.div variants={itemVariants}>
             <Card className="glass-card">

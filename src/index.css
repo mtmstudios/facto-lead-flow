@@ -356,3 +356,22 @@
   background: hsl(var(--success));
   animation: pulse-dot 2s ease-in-out infinite;
 }
+
+/* ========== Safe Area (Notched Phones) ========== */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ========== Mobile Touch Feedback ========== */
+@media (max-width: 767px) {
+  .glass-card {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent text selection on drag/touch interactions */
+  .lead-card,
+  .pipeline-column {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}

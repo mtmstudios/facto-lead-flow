@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLeads, useCreateLead, useUpdateLead, type Lead } from '@/hooks/useLeads';
 import { StatusBadge, PrioBadge } from '@/components/Badges';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LEAD_STATUSES, LEAD_QUELLEN, LEAD_PRIORITAETEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatCurrency, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
-import { Plus, Download, X, ChevronUp, ChevronDown, Search, Filter, Users, Building2 } from 'lucide-react';
+import { Plus, Download, X, ChevronUp, ChevronDown, Search, Filter, Users, Building2, DollarSign, Clock, ChevronRight, AlertTriangle, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
@@ -96,6 +96,13 @@ export default function LeadsPage() {
   const perPage = 25;
 
   const hasActiveFilter = statusFilter !== 'all' || quelleFilter !== 'all' || prioFilter !== 'all' || search !== '';
+
+  // Listen for keyboard shortcut from AppLayout
+  useEffect(() => {
+    const handler = () => setNewLeadOpen(true);
+    window.addEventListener('shortcut:new-lead', handler);
+    return () => window.removeEventListener('shortcut:new-lead', handler);
+  }, []);
 
   const filtered = useMemo(() => {
     let result = leads;
@@ -206,54 +213,54 @@ export default function LeadsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Leads</h1>
-          <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Leads</h1>
+          <p className="text-xs md:text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
             <Users className="h-3.5 w-3.5" />
-            {filtered.length} von {leads.length} Leads
+            {filtered.length} von {leads.length}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={exportCSV} className="h-9">
-            <Download className="h-3.5 w-3.5 mr-1.5" />Exportieren
+          <Button variant="outline" size="sm" onClick={exportCSV} className="h-8 md:h-9 text-xs md:text-sm">
+            <Download className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">Exportieren</span>
           </Button>
-          <Button size="sm" onClick={() => setNewLeadOpen(true)} className="h-9">
-            <Plus className="h-3.5 w-3.5 mr-1.5" />Neuer Lead
+          <Button size="sm" onClick={() => setNewLeadOpen(true)} className="h-8 md:h-9 text-xs md:text-sm">
+            <Plus className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden sm:inline">Neuer Lead</span>
           </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="glass-card p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+      <div className="glass-card p-3 md:p-4">
+        <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-2 md:gap-3">
+          <div className="relative flex-1 min-w-0 md:min-w-[200px] md:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
-              placeholder="Name, Unternehmen oder E-Mail suchen..."
+              placeholder="Suchen..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
               className="pl-9 h-9 bg-background/50"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0 hidden md:block" />
             <Select value={statusFilter} onValueChange={v => { setStatusFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-[150px] h-9 bg-background/50"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectTrigger className="w-[120px] md:w-[150px] h-9 bg-background/50 shrink-0"><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Status</SelectItem>
                 {LEAD_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={quelleFilter} onValueChange={v => { setQuelleFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-[140px] h-9 bg-background/50"><SelectValue placeholder="Quelle" /></SelectTrigger>
+              <SelectTrigger className="w-[110px] md:w-[140px] h-9 bg-background/50 shrink-0"><SelectValue placeholder="Quelle" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Alle Quellen</SelectItem>
                 {LEAD_QUELLEN.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={prioFilter} onValueChange={v => { setPrioFilter(v); setPage(0); }}>
-              <SelectTrigger className="w-[130px] h-9 bg-background/50"><SelectValue placeholder="Priorität" /></SelectTrigger>
+              <SelectTrigger className="w-[100px] md:w-[130px] h-9 bg-background/50 shrink-0"><SelectValue placeholder="Prio" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Alle Prios</SelectItem>
+                <SelectItem value="all">Alle</SelectItem>
                 {LEAD_PRIORITAETEN.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -295,8 +302,104 @@ export default function LeadsPage() {
         )}
       </AnimatePresence>
 
-      {/* Table */}
-      <div className="premium-table">
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-2">
+        {paged.map((lead, i) => (
+          <motion.div
+            key={lead.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.03 }}
+            onClick={() => navigate(`/leads/${lead.id}`)}
+            className={`glass-card p-3.5 cursor-pointer active:scale-[0.98] transition-transform ${isOverdue(lead) ? 'border-destructive/30' : ''}`}
+          >
+            {/* Top Row: Avatar + Name + Prio + Arrow */}
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-full bg-primary/8 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
+                {lead.vorname[0]}{lead.nachname[0]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-semibold truncate">{lead.vorname} {lead.nachname}</p>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <PrioBadge prio={lead.prioritaet} />
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  </div>
+                </div>
+                {lead.unternehmen && (
+                  <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                    <Building2 className="h-3 w-3 shrink-0" />
+                    {lead.unternehmen}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Middle Row: Status + Potential */}
+            <div className="flex items-center justify-between mt-2.5 pl-12">
+              <div onClick={e => e.stopPropagation()}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <StatusBadge status={lead.status} className="cursor-pointer" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    {LEAD_STATUSES.map(s => (
+                      <DropdownMenuItem key={s} onClick={() => handleQuickStatusChange(lead.id, s)}>{s}</DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
+                <span className="text-sm font-semibold text-primary tabular-nums flex items-center gap-1">
+                  <DollarSign className="h-3 w-3" />
+                  {formatCurrency(lead.rechner_ergebnis)}
+                </span>
+              )}
+            </div>
+
+            {/* Bottom Row: Contact Actions + Time */}
+            <div className="flex items-center justify-between mt-2 pl-12">
+              <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                {lead.telefon && (
+                  <a href={`tel:${lead.telefon}`} className="h-7 w-7 rounded-full bg-primary/8 flex items-center justify-center text-primary hover:bg-primary/15 transition-colors">
+                    <Phone className="h-3 w-3" />
+                  </a>
+                )}
+                {lead.email && (
+                  <a href={`mailto:${lead.email}`} className="h-7 w-7 rounded-full bg-primary/8 flex items-center justify-center text-primary hover:bg-primary/15 transition-colors">
+                    <Mail className="h-3 w-3" />
+                  </a>
+                )}
+                {lead.quelle && (
+                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    {lead.quelle}
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatRelativeTime(lead.created_at)}
+              </span>
+            </div>
+
+            {/* Overdue Warning */}
+            {isOverdue(lead) && (
+              <div className="flex items-center gap-1.5 mt-2 pl-12 text-destructive">
+                <AlertTriangle className="h-3 w-3" />
+                <span className="text-[11px] font-medium">Überfällig</span>
+              </div>
+            )}
+          </motion.div>
+        ))}
+        {paged.length === 0 && (
+          <div className="glass-card p-12 text-center text-muted-foreground text-sm">
+            {hasActiveFilter ? 'Keine Leads für diese Filter gefunden' : 'Noch keine Leads vorhanden'}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="premium-table hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

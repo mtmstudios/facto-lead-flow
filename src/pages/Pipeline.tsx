@@ -9,15 +9,16 @@ import {
   DragOverlay,
   closestCenter,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
   useDroppable,
+  useDraggable,
 } from '@dnd-kit/core';
-import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Building2, DollarSign, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
+import { GripVertical, Building2, DollarSign, Clock, TrendingUp, AlertTriangle, ChevronRight } from 'lucide-react';
 
 const PIPELINE_STATUSES = [
   'Neu', 'Mail gesendet', 'Kontaktiert', 'Erstgespräch geplant',
@@ -133,7 +134,7 @@ function LeadCardOverlay({ lead }: { lead: Lead }) {
   );
 }
 
-function DroppableColumn({ status, leads: columnLeads, isOver }: { status: string; leads: Lead[]; isOver: boolean }) {
+function DroppableColumn({ status, leads: columnLeads, isOver, convRate }: { status: string; leads: Lead[]; isOver: boolean; convRate?: number }) {
   const { setNodeRef, isOver: dndIsOver } = useDroppable({ id: status });
   const active = isOver || dndIsOver;
   const columnValue = columnLeads.reduce((sum, l) => sum + (l.rechner_ergebnis || 0), 0);
@@ -141,7 +142,7 @@ function DroppableColumn({ status, leads: columnLeads, isOver }: { status: strin
   return (
     <div
       ref={setNodeRef}
-      className={`pipeline-column flex flex-col w-[272px] shrink-0 ${active ? 'drag-over' : ''}`}
+      className={`pipeline-column flex flex-col w-[240px] md:w-[272px] shrink-0 snap-start ${active ? 'drag-over' : ''}`}
     >
       {/* Column Header */}
       <div className="p-3 border-b border-border/50">
@@ -154,11 +155,20 @@ function DroppableColumn({ status, leads: columnLeads, isOver }: { status: strin
             {columnLeads.length}
           </span>
         </div>
-        {columnValue > 0 && (
-          <p className="text-[11px] text-muted-foreground pl-4">
-            {formatCurrency(columnValue)}
-          </p>
-        )}
+        <div className="flex items-center gap-2 pl-4">
+          {columnValue > 0 && (
+            <p className="text-[11px] text-muted-foreground">
+              {formatCurrency(columnValue)}
+            </p>
+          )}
+          {convRate !== undefined && convRate > 0 && (
+            <span className={`text-[10px] font-semibold tabular-nums ${
+              convRate >= 70 ? 'text-emerald-500' : convRate >= 40 ? 'text-amber-500' : 'text-red-400'
+            }`}>
+              {convRate}% Conv.
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Cards */}
@@ -199,6 +209,9 @@ export default function PipelinePage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
     })
   );
 
@@ -257,37 +270,54 @@ export default function PipelinePage() {
     );
   }
 
+  // Conversion rates between columns
+  const conversionRates = useMemo(() => {
+    const rates: Record<string, number> = {};
+    for (let i = 1; i < columns.length; i++) {
+      const prev = columns[i - 1];
+      const curr = columns[i];
+      // Count leads at this stage or further
+      const atOrPast = PIPELINE_STATUSES.slice(i);
+      const atOrPastPrev = PIPELINE_STATUSES.slice(i - 1);
+      const countPrev = leads.filter(l => atOrPastPrev.includes(l.status)).length;
+      const countCurr = leads.filter(l => atOrPast.includes(l.status)).length;
+      rates[curr.status] = countPrev > 0 ? Math.round((countCurr / countPrev) * 100) : 0;
+    }
+    return rates;
+  }, [columns, leads]);
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 md:space-y-5">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between flex-wrap gap-4"
+        className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Pipeline</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Leads per Drag & Drop durch die Pipeline bewegen
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Pipeline</h1>
+          <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
+            <span className="hidden md:inline">Leads per Drag & Drop durch die Pipeline bewegen</span>
+            <span className="md:hidden">Tippen & Halten zum Verschieben</span>
           </p>
         </div>
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-3 md:gap-5 overflow-x-auto">
+          <div className="flex items-center gap-2 shrink-0">
+            <TrendingUp className="h-4 w-4 text-muted-foreground hidden md:block" />
             <div className="text-right">
-              <p className="text-xs text-muted-foreground">Pipeline</p>
-              <p className="text-sm font-bold tabular-nums">{formatCurrency(totalPipeline)}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Pipeline</p>
+              <p className="text-xs md:text-sm font-bold tabular-nums">{formatCurrency(totalPipeline)}</p>
             </div>
           </div>
-          <div className="h-8 w-px bg-border" />
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Mandate</p>
-            <p className="text-sm font-bold text-emerald-500 tabular-nums">{formatCurrency(totalMandate)}</p>
+          <div className="h-6 md:h-8 w-px bg-border shrink-0" />
+          <div className="text-right shrink-0">
+            <p className="text-[10px] md:text-xs text-muted-foreground">Mandate</p>
+            <p className="text-xs md:text-sm font-bold text-emerald-500 tabular-nums">{formatCurrency(totalMandate)}</p>
           </div>
-          <div className="h-8 w-px bg-border" />
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Verloren</p>
-            <p className="text-sm font-bold text-destructive tabular-nums">{closedLeads.length}</p>
+          <div className="h-6 md:h-8 w-px bg-border shrink-0" />
+          <div className="text-right shrink-0">
+            <p className="text-[10px] md:text-xs text-muted-foreground">Verloren</p>
+            <p className="text-xs md:text-sm font-bold text-destructive tabular-nums">{closedLeads.length}</p>
           </div>
         </div>
       </motion.div>
@@ -299,13 +329,14 @@ export default function PipelinePage() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-3 overflow-x-auto pb-4 -mx-2 px-2" style={{ minHeight: 'calc(100vh - 220px)' }}>
+        <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-2 md:px-2 snap-x snap-mandatory md:snap-none" style={{ minHeight: 'calc(100vh - 240px)' }}>
           {columns.map(col => (
             <DroppableColumn
               key={col.status}
               status={col.status}
               leads={col.leads}
               isOver={false}
+              convRate={conversionRates[col.status]}
             />
           ))}
         </div>
