@@ -45,12 +45,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Logo */}
         <div className="flex h-16 items-center px-4 relative">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5f8a] flex items-center justify-center shrink-0">
-            <span className="text-white text-sm font-black leading-none">fn</span>
+          <img src={logoImg} alt="factonet" className="h-8 w-auto shrink-0 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200" />
+          <div className="absolute inset-0 flex items-center px-4 group-hover/sidebar:opacity-0 transition-opacity duration-200 pointer-events-none">
+            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary)/0.7)] flex items-center justify-center shrink-0">
+              <span className="text-primary-foreground text-sm font-black leading-none">fn</span>
+            </div>
           </div>
-          <span className="ml-3 text-lg font-bold tracking-tight opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-            <span className="text-[#1e3a5f] dark:text-blue-300">facto</span><span className="text-[#3b82f6]">net</span>
-          </span>
         </div>
 
         {/* Nav */}
@@ -116,12 +116,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-30">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5f8a] flex items-center justify-center">
-              <span className="text-white text-xs font-black leading-none">fn</span>
-            </div>
-            <span className="text-base font-bold tracking-tight">
-              <span className="text-[#1e3a5f] dark:text-blue-300">facto</span><span className="text-[#3b82f6]">net</span>
-            </span>
+            <img src={logoImg} alt="factonet" className="h-7 w-auto" />
           </div>
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
