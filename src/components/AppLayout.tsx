@@ -2,7 +2,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Kanban, LogOut, Sun, Moon, Zap } from 'lucide-react';
+import { LayoutDashboard, Users, Kanban, LogOut, Sun, Moon } from 'lucide-react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -43,12 +43,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-primary/[0.02] pointer-events-none" />
 
         {/* Logo */}
-        <div className="flex h-16 items-center px-5 relative">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 ring-1 ring-primary/10">
-            <Zap className="h-4.5 w-4.5 text-primary" />
+        <div className="flex h-16 items-center px-4 relative">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5f8a] flex items-center justify-center shrink-0">
+            <span className="text-white text-sm font-black leading-none">fn</span>
           </div>
           <span className="ml-3 text-lg font-bold tracking-tight opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-            <span className="gradient-text">factonet</span>
+            <span className="text-[#1e3a5f] dark:text-blue-300">facto</span><span className="text-[#3b82f6]">net</span>
           </span>
         </div>
 
@@ -115,10 +115,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-30">
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
-              <Zap className="h-4 w-4 text-primary" />
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-[#1e3a5f] to-[#2d5f8a] flex items-center justify-center">
+              <span className="text-white text-xs font-black leading-none">fn</span>
             </div>
-            <span className="text-base font-bold tracking-tight gradient-text">factonet</span>
+            <span className="text-base font-bold tracking-tight">
+              <span className="text-[#1e3a5f] dark:text-blue-300">facto</span><span className="text-[#3b82f6]">net</span>
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={toggleTheme} className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">

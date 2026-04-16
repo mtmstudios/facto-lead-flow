@@ -27,13 +27,13 @@ const PIPELINE_STATUSES = [
 ];
 
 const STATUS_HEX: Record<string, string> = {
-  'Neu': '#14B8A6',
-  'Mail gesendet': '#38BDF8',
+  'Neu': '#3B82F6',
+  'Mail gesendet': '#60A5FA',
   'Kontaktiert': '#F59E0B',
   'Erstgespräch geplant': '#F97316',
   'Erstgespräch durchgeführt': '#FB923C',
   'Fragenkatalog gesendet': '#818CF8',
-  'Fragenkatalog beantwortet': '#A78BFA',
+  'Fragenkatalog beantwortet': '#6366F1',
   'Qualifiziert': '#A855F7',
   'Mandat': '#22C55E',
 };
@@ -146,7 +146,7 @@ function DroppableColumn({ status, leads: columnLeads, convRate }: { status: str
             )}
             {convRate !== undefined && convRate > 0 && (
               <span className={`text-[9px] font-bold num ${
-                convRate >= 70 ? 'text-emerald-400' : convRate >= 40 ? 'text-amber-400' : 'text-red-400'
+                convRate >= 70 ? 'text-emerald-600 dark:text-emerald-400' : convRate >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
               }`}>
                 {convRate}%
               </span>
@@ -275,7 +275,7 @@ export default function PipelinePage() {
           <div className="h-6 w-px bg-border/50" />
           <div className="text-right">
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-semibold">Mandate</p>
-            <p className="text-sm md:text-base font-black text-emerald-400 num">{formatCurrency(totalMandate)}</p>
+            <p className="text-sm md:text-base font-black text-emerald-600 dark:text-emerald-400 num">{formatCurrency(totalMandate)}</p>
           </div>
           <div className="h-6 w-px bg-border/50" />
           <div className="text-right">

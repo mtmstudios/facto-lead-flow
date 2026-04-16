@@ -21,7 +21,7 @@ const FUNNEL_STAGES = [
   'Erstgespräch durchgeführt', 'Fragenkatalog gesendet', 'Fragenkatalog beantwortet',
   'Qualifiziert', 'Mandat'
 ];
-const FUNNEL_COLORS = ['#14B8A6', '#38BDF8', '#F59E0B', '#F97316', '#A78BFA', '#818CF8', '#8B5CF6', '#A855F7', '#22C55E'];
+const FUNNEL_COLORS = ['#3B82F6', '#60A5FA', '#F59E0B', '#F97316', '#818CF8', '#6366F1', '#8B5CF6', '#A855F7', '#22C55E'];
 
 /* ── Radial Ring ── */
 function RadialRing({ value, max, color, size = 44 }: { value: number; max: number; color: string; size?: number }) {
@@ -92,7 +92,7 @@ function KPICard({ title, value, subtitle, icon: Icon, trend, sparkData, ringVal
               <p className="text-[10px] md:text-[11px] text-muted-foreground flex items-center gap-1.5 flex-wrap">
                 {trend !== undefined && trend !== 0 && (
                   <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
-                    trend > 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                    trend > 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'
                   }`}>
                     {trend > 0 ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
                     {trend > 0 ? '+' : ''}{trend}%
@@ -252,7 +252,7 @@ export default function DashboardPage() {
         />
         <KPICard
           title="Kontaktiert" value={stats.kontaktiertCount} subtitle="bearbeitet"
-          icon={Phone} ringValue={stats.kontaktiertCount} ringMax={leads.length} ringColor="#14B8A6"
+          icon={Phone} ringValue={stats.kontaktiertCount} ringMax={leads.length} ringColor="#3B82F6"
         />
         <KPICard
           title="Termine" value={stats.termineCount} subtitle={`${stats.terminRate}% Rate`}
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                           <span className="text-[10px] text-muted-foreground num">{stage.pct}%</span>
                           {convRate !== null && (
                             <span className={`text-[9px] font-bold num hidden md:block ${
-                              convRate >= 70 ? 'text-emerald-400' : convRate >= 40 ? 'text-amber-400' : 'text-red-400'
+                              convRate >= 70 ? 'text-emerald-600 dark:text-emerald-400' : convRate >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
                             }`}>
                               ↓{convRate}%
                             </span>
