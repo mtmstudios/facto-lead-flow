@@ -104,7 +104,7 @@ export default function DashboardPage() {
       {/* Header */}
       <motion.div variants={itemVariants} className="flex items-end justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-tight">Dashboard</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-tight">Lead-Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">
             <span className="num">{leads.length} Leads</span>
             <span className="mx-2 text-border">|</span>
