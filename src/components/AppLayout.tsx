@@ -8,7 +8,7 @@ import logoImg from '@/assets/logo.png';
 import mtmLogoImg from '@/assets/mtm-logo.png';
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard', shortcut: 'D' },
+  { to: '/', icon: LayoutDashboard, label: 'Lead-Dashboard', shortcut: 'D' },
   { to: '/leads', icon: Users, label: 'Leads', shortcut: 'N' },
   { to: '/pipeline', icon: Kanban, label: 'Pipeline', shortcut: 'P' },
 ];
