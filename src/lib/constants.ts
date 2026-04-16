@@ -11,6 +11,12 @@ export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 
 export const ENTWICKLUNGSAUFWAND_OPTIONS = ['unter 100.000 EUR', '100.000 – 400.000 EUR', '400.000 – 1.000.000 EUR', 'über 1.000.000 EUR'] as const;
 export const MA_ENTWICKLUNG_OPTIONS = ['1', '2–5', '6–10', 'mehr als 10'] as const;
 
+// Simplified status list for dropdowns (matches 5 pipeline columns + negative outcomes)
+export const DROPDOWN_STATUSES = [
+  'Neu', 'Kontaktiert', 'Erstgespräch geplant', 'Qualifiziert', 'Mandat',
+  'Kalt', 'Disqualifiziert'
+] as const;
+
 export type LeadStatus = typeof LEAD_STATUSES[number];
 export type LeadPrioritaet = typeof LEAD_PRIORITAETEN[number];
 

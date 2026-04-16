@@ -128,15 +128,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          className="p-4 md:p-8"
-        >
+        <div className="p-4 md:p-8">
           {children}
-        </motion.div>
+        </div>
       </main>
 
       {/* Mobile Bottom Navigation — 3 items only */}

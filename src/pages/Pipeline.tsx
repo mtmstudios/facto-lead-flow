@@ -102,7 +102,7 @@ function DroppableColumn({ columnKey, label, color, leads: columnLeads }: {
   return (
     <div
       ref={setNodeRef}
-      className={`pipeline-column flex flex-col flex-1 min-w-[180px] ${isOver ? 'drag-over' : ''}`}
+      className={`pipeline-column flex flex-col flex-1 min-w-[240px] md:min-w-[180px] snap-center ${isOver ? 'drag-over' : ''}`}
     >
       {/* Column Header */}
       <div className="px-3 py-3 border-b border-border/30">
@@ -243,8 +243,8 @@ export default function PipelinePage() {
         onDragEnd={handleDragEnd}
       >
         <div
-          className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none"
-          style={{ minHeight: 'calc(100vh - 200px)' }}
+          className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide"
+          style={{ minHeight: 'calc(100vh - 220px)' }}
         >
           {columns.map(col => (
             <DroppableColumn

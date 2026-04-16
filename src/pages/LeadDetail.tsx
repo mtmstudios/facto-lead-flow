@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { LEAD_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
+import { DROPDOWN_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -128,7 +128,7 @@ export default function LeadDetail() {
     if (editField === field) {
       return (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground w-28 shrink-0">{label}</span>
+          <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
           <Input
             type={type}
             value={editValue}
@@ -151,8 +151,8 @@ export default function LeadDetail() {
         className="flex items-center gap-2 cursor-pointer group py-0.5"
         onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
       >
-        <span className="text-sm text-muted-foreground w-28 shrink-0">{label}</span>
-        <span className="text-sm group-hover:text-primary transition-colors">
+        <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
+        <span className="text-sm group-hover:text-primary transition-colors truncate">
           {value || <span className="text-muted-foreground/40 italic">–</span>}
         </span>
       </div>
@@ -169,89 +169,92 @@ export default function LeadDetail() {
     <div className="space-y-5 max-w-4xl mx-auto">
       {/* Header */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-9 w-9 rounded-lg shrink-0">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <div className="flex items-center gap-3">
-                {/* Score */}
-                <div className="relative h-11 w-11 shrink-0">
-                  <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
-                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
-                    <circle cx="18" cy="18" r="15.5" fill="none" stroke={scoreColor} strokeWidth="2.5"
-                      strokeDasharray={`${leadScore} ${100 - leadScore}`} strokeLinecap="round"
-                      className="transition-all duration-1000 ease-out" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-bold" style={{ color: scoreColor }}>{leadScore}</span>
+        {/* Mobile: stacked layout, Desktop: side by side */}
+        <div className="space-y-3 md:space-y-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2 md:gap-3 min-w-0 flex-1">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-9 w-9 rounded-lg shrink-0 mt-0.5">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 md:gap-3">
+                  {/* Score */}
+                  <div className="relative h-10 w-10 md:h-11 md:w-11 shrink-0">
+                    <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke={scoreColor} strokeWidth="2.5"
+                        strokeDasharray={`${leadScore} ${100 - leadScore}`} strokeLinecap="round"
+                        className="transition-all duration-1000 ease-out" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold" style={{ color: scoreColor }}>{leadScore}</span>
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <h1 className="text-base md:text-xl font-black tracking-tight truncate">{lead.vorname} {lead.nachname}</h1>
+                    <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
+                      <Building2 className="h-3 w-3 md:h-3.5 md:w-3.5 shrink-0" />
+                      <span className="truncate">{lead.unternehmen || 'Kein Unternehmen'}</span>
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <h1 className="text-lg md:text-xl font-black tracking-tight">{lead.vorname} {lead.nachname}</h1>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    <Building2 className="h-3.5 w-3.5" />
-                    {lead.unternehmen || 'Kein Unternehmen'}
-                  </p>
+                <div className="flex items-center gap-1.5 md:gap-2 mt-2 flex-wrap">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
+                    <DropdownMenuContent>{DROPDOWN_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
+                  </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger><PrioBadge prio={lead.prioritaet} className="cursor-pointer" /></DropdownMenuTrigger>
+                    <DropdownMenuContent>{LEAD_PRIORITAETEN.map(p => <DropdownMenuItem key={p} onClick={() => updateLead.mutate({ id: lead.id, prioritaet: p })}>{p}</DropdownMenuItem>)}</DropdownMenuContent>
+                  </DropdownMenu>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] md:text-xs font-medium ${
+                    ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                    ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                    ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {ffInfo.label}
+                  </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mt-2 flex-wrap">
-                <DropdownMenu>
-                  <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
-                  <DropdownMenuContent>{LEAD_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                  <DropdownMenuTrigger><PrioBadge prio={lead.prioritaet} className="cursor-pointer" /></DropdownMenuTrigger>
-                  <DropdownMenuContent>{LEAD_PRIORITAETEN.map(p => <DropdownMenuItem key={p} onClick={() => updateLead.mutate({ id: lead.id, prioritaet: p })}>{p}</DropdownMenuItem>)}</DropdownMenuContent>
-                </DropdownMenu>
-                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
-                  ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {ffInfo.label}
-                </span>
-              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {lead.telefon && (
-              <Button variant="outline" size="sm" asChild className="h-9">
-                <a href={`tel:${lead.telefon}`}><Phone className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
-              </Button>
-            )}
-            {lead.email && (
-              <Button variant="outline" size="sm" asChild className="h-9">
-                <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
-              </Button>
-            )}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" className="h-9"><Trash2 className="h-4 w-4" /></Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Lead löschen?</AlertDialogTitle>
-                  <AlertDialogDescription>Dieser Lead und alle Aktivitäten werden unwiderruflich gelöscht.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+              {lead.telefon && (
+                <Button variant="outline" size="sm" asChild className="h-8 md:h-9 px-2 md:px-3">
+                  <a href={`tel:${lead.telefon}`}><Phone className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
+                </Button>
+              )}
+              {lead.email && (
+                <Button variant="outline" size="sm" asChild className="h-8 md:h-9 px-2 md:px-3">
+                  <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
+                </Button>
+              )}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="h-8 md:h-9 px-2 md:px-3"><Trash2 className="h-4 w-4" /></Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="max-w-[90vw] md:max-w-lg">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Lead löschen?</AlertDialogTitle>
+                    <AlertDialogDescription>Dieser Lead und alle Aktivitäten werden unwiderruflich gelöscht.</AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-border/50">
+        <div className="flex gap-0.5 md:gap-1 border-b border-border/50 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2.5 text-sm font-medium transition-colors relative ${
+              className={`px-3 md:px-4 py-2.5 text-sm font-medium transition-colors relative whitespace-nowrap shrink-0 ${
                 activeTab === tab.key
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground'
@@ -259,7 +262,7 @@ export default function LeadDetail() {
             >
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
-                <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
+                <span className="ml-1 md:ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
               )}
               {activeTab === tab.key && (
                 <motion.div
@@ -295,23 +298,23 @@ export default function LeadDetail() {
                 <div className="space-y-2">
                   <h3 className="text-sm font-bold mb-3">Qualifizierung</h3>
                   <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-sm text-muted-foreground w-28 shrink-0">Mitarbeiter</span>
+                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Mitarbeiter</span>
                     <span className="text-sm">{lead.mitarbeiter || '–'}</span>
                   </div>
                   <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-sm text-muted-foreground w-28 shrink-0">Entwicklung</span>
+                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Entwicklung</span>
                     <span className="text-sm">{lead.entwicklung || '–'}</span>
                   </div>
                   <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-sm text-muted-foreground w-28 shrink-0">Branche</span>
+                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Branche</span>
                     <span className="text-sm">{lead.branche || '–'}</span>
                   </div>
                   <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-sm text-muted-foreground w-28 shrink-0">Quelle</span>
+                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Quelle</span>
                     <span className="text-sm">{lead.quelle || '–'}</span>
                   </div>
                   <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-sm text-muted-foreground w-28 shrink-0">Erstellt</span>
+                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Erstellt</span>
                     <span className="text-sm text-muted-foreground">{formatDateTime(lead.created_at)}</span>
                   </div>
                   <div className="pt-3 mt-3 border-t border-border/30">

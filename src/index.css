@@ -276,6 +276,10 @@
 /* ========== Safe Area ========== */
 .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
+/* ========== Scrollbar Hide ========== */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ========== Mobile ========== */
 @media (max-width: 767px) {
   .glass-card { -webkit-tap-highlight-color: transparent; }

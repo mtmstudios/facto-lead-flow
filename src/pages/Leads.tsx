@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { LEAD_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatCurrency, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
+import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatCurrency, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
 import { Plus, Download, X, ChevronUp, ChevronDown, Search, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
@@ -213,7 +213,7 @@ export default function LeadsPage() {
           <SelectTrigger className="w-[160px] h-10"><SelectValue placeholder="Alle Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle Status</SelectItem>
-            {LEAD_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            {DROPDOWN_STATUSES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
           </SelectContent>
         </Select>
         <AnimatePresence>
@@ -296,7 +296,7 @@ export default function LeadsPage() {
                         <StatusBadge status={lead.status} className="cursor-pointer" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        {LEAD_STATUSES.map(s => (
+                        {DROPDOWN_STATUSES.map(s => (
                           <DropdownMenuItem key={s} onClick={() => handleQuickStatusChange(lead.id, s)}>{s}</DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
