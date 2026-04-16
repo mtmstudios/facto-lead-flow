@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Lock, Mail } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
+import mtmLogoImg from '@/assets/mtm-logo.png';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -142,19 +143,15 @@ export default function LoginPage() {
           </form>
 
           {/* Footer — Agency branding */}
-          <div className="flex items-center justify-center gap-2 mt-10">
-            <span className="text-[11px] text-muted-foreground/30">powered by</span>
+          <div className="flex flex-col items-center gap-1.5 mt-10">
+            <span className="text-[10px] text-muted-foreground/30">powered by</span>
             <a
               href="https://mtmstudios.de"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors"
+              className="hover:opacity-70 transition-opacity"
             >
-              {/* Logo placeholder — replace with <img> via Lovable */}
-              <div className="h-4 w-4 rounded bg-[#000] flex items-center justify-center shrink-0">
-                <span className="text-[#00E5C0] text-[5px] font-black leading-none">MTM</span>
-              </div>
-              <span className="text-[11px] font-semibold">MTM Studios</span>
+              <img src={mtmLogoImg} alt="MTM Studios" className="h-5 w-auto opacity-40" />
             </a>
           </div>
         </motion.div>

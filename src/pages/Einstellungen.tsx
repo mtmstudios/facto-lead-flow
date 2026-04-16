@@ -21,7 +21,7 @@ const itemVariants = {
 };
 
 export default function EinstellungenPage() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const { user } = useAuth();
   const [newPassword, setNewPassword] = useState('');
   const [changingPw, setChangingPw] = useState(false);
@@ -93,9 +93,9 @@ export default function EinstellungenPage() {
             <div className="flex items-center justify-between">
               <div>
                 <Label className="font-medium">Dark Mode</Label>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Dunkles Farbschema verwenden</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Dunkles Farbschema verwenden (coming soon)</p>
               </div>
-              <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
+              <Switch checked={false} disabled />
             </div>
           </CardContent>
         </Card>

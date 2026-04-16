@@ -5,6 +5,7 @@ import { LayoutDashboard, Users, Kanban, LogOut } from 'lucide-react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import logoImg from '@/assets/logo.png';
+import mtmLogoImg from '@/assets/mtm-logo.png';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', shortcut: 'D' },
@@ -98,17 +99,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* Agency branding */}
-          <a
-            href="https://mtmstudios.de"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 mt-2 border-t border-border/30 pt-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 hover:opacity-80"
-          >
-            <div className="h-5 w-5 rounded bg-[#000] flex items-center justify-center shrink-0">
-              <span className="text-[#00E5C0] text-[7px] font-black leading-none">MTM</span>
-            </div>
-            <span className="text-[10px] text-muted-foreground/50 whitespace-nowrap">powered by MTM Studios</span>
-          </a>
+          <div className="flex flex-col items-center gap-1 px-3 py-2 mt-2 border-t border-border/30 pt-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
+            <span className="text-[9px] text-muted-foreground/30">powered by</span>
+            <a
+              href="https://mtmstudios.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-70 transition-opacity"
+            >
+              <img src={mtmLogoImg} alt="MTM Studios" className="h-4 w-auto opacity-40" />
+            </a>
+          </div>
         </div>
       </aside>
 
