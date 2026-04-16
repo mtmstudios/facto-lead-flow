@@ -9,8 +9,6 @@ import LoginPage from "@/pages/Login";
 import DashboardPage from "@/pages/Dashboard";
 import LeadsPage from "@/pages/Leads";
 import LeadDetail from "@/pages/LeadDetail";
-import KalenderPage from "@/pages/Kalender";
-import EinstellungenPage from "@/pages/Einstellungen";
 import PipelinePage from "@/pages/Pipeline";
 import NotFound from "./pages/NotFound";
 
@@ -27,8 +25,6 @@ function AppRoutes() {
             <Route path="/leads" element={<LeadsPage />} />
             <Route path="/leads/:id" element={<LeadDetail />} />
             <Route path="/pipeline" element={<PipelinePage />} />
-            <Route path="/kalender" element={<KalenderPage />} />
-            <Route path="/einstellungen" element={<EinstellungenPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppLayout>

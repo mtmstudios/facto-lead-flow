@@ -213,10 +213,9 @@ export default function LeadsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Leads</h1>
-          <p className="text-xs md:text-sm text-muted-foreground mt-0.5 flex items-center gap-2">
-            <Users className="h-3.5 w-3.5" />
-            {filtered.length} von {leads.length}
+          <h1 className="text-xl md:text-2xl font-black tracking-tight">Leads</h1>
+          <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+            <span className="num">{filtered.length} von {leads.length}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -481,7 +480,7 @@ export default function LeadsPage() {
                     </span>
                   </td>
                   <td className="p-3">
-                    <span className="font-semibold text-primary tabular-nums">{formatCurrency(lead.rechner_ergebnis)}</span>
+                    <span className="font-bold text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
                   </td>
                   <td className="p-3 text-muted-foreground whitespace-nowrap text-xs">{formatRelativeTime(lead.created_at)}</td>
                 </motion.tr>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLeads, useUpdateLead, type Lead } from '@/hooks/useLeads';
 import { PrioBadge } from '@/components/Badges';
-import { LEAD_STATUSES, formatCurrency, formatRelativeTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS } from '@/lib/constants';
+import { formatCurrency, formatRelativeTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS } from '@/lib/constants';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,7 +18,7 @@ import {
   useDraggable,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Building2, DollarSign, Clock, TrendingUp, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Building2, Clock, AlertTriangle } from 'lucide-react';
 
 const PIPELINE_STATUSES = [
   'Neu', 'Mail gesendet', 'Kontaktiert', 'Erstgespräch geplant',
@@ -26,23 +26,21 @@ const PIPELINE_STATUSES = [
   'Qualifiziert', 'Mandat'
 ];
 
-const STATUS_COLORS: Record<string, string> = {
-  'Neu': 'bg-teal-500',
-  'Mail gesendet': 'bg-sky-500',
-  'Kontaktiert': 'bg-amber-500',
-  'Erstgespräch geplant': 'bg-orange-500',
-  'Erstgespräch durchgeführt': 'bg-orange-400',
-  'Fragenkatalog gesendet': 'bg-indigo-500',
-  'Fragenkatalog beantwortet': 'bg-indigo-400',
-  'Qualifiziert': 'bg-purple-500',
-  'Mandat': 'bg-emerald-500',
+const STATUS_HEX: Record<string, string> = {
+  'Neu': '#14B8A6',
+  'Mail gesendet': '#38BDF8',
+  'Kontaktiert': '#F59E0B',
+  'Erstgespräch geplant': '#F97316',
+  'Erstgespräch durchgeführt': '#FB923C',
+  'Fragenkatalog gesendet': '#818CF8',
+  'Fragenkatalog beantwortet': '#A78BFA',
+  'Qualifiziert': '#A855F7',
+  'Mandat': '#22C55E',
 };
 
 function DraggableLeadCard({ lead }: { lead: Lead }) {
   const navigate = useNavigate();
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: lead.id,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
 
   const ff = berechneFoerderfaehigkeit(lead);
   const ffInfo = FOERDERFAEHIGKEIT_LABELS[ff];
@@ -51,68 +49,54 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
 
   const style = {
     transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.4 : 1,
-    transition: isDragging ? undefined : 'opacity 0.2s ease',
+    opacity: isDragging ? 0.3 : 1,
+    transition: isDragging ? undefined : 'opacity 0.15s ease',
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="group">
+    <div ref={setNodeRef} style={style}>
       <div
-        className={`lead-card p-3 space-y-2.5 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}
+        className={`lead-card p-3 space-y-2 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}
         {...listeners}
         {...attributes}
       >
-        {/* Drag Handle + Name */}
-        <div className="flex items-start gap-2">
-          <div className="mt-0.5 opacity-0 group-hover:opacity-100 md:transition-opacity shrink-0 text-muted-foreground hidden md:block">
-            <GripVertical className="h-3.5 w-3.5" />
-          </div>
-          <div className="flex-1 min-w-0" onClick={() => navigate(`/leads/${lead.id}`)}>
-            <div className="flex items-start justify-between gap-1">
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate cursor-pointer hover:text-primary transition-colors">
-                  {lead.vorname} {lead.nachname}
-                </p>
-                {lead.unternehmen && (
-                  <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1">
-                    <Building2 className="h-3 w-3 shrink-0" />
-                    {lead.unternehmen}
-                  </p>
-                )}
-              </div>
-              <PrioBadge prio={lead.prioritaet} />
-            </div>
-          </div>
-        </div>
-
-        {/* Funding Potential */}
-        {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-          <div className="flex items-center gap-1.5 pl-5">
-            <DollarSign className="h-3 w-3 text-primary shrink-0" />
-            <span className="text-sm font-semibold text-primary">{formatCurrency(lead.rechner_ergebnis)}</span>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pl-5">
-          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {formatRelativeTime(lead.created_at)}
-          </span>
-          <div className="flex items-center gap-1.5">
-            {ff !== 'unbekannt' && (
-              <span className={`text-[11px] font-medium ${ffInfo.color}`}>
-                {ff === 'gruen' && '●'}{ff === 'gelb' && '●'}{ff === 'rot' && '●'}
-              </span>
+        {/* Name + Prio */}
+        <div className="flex items-start justify-between gap-1" onClick={() => navigate(`/leads/${lead.id}`)}>
+          <div className="min-w-0 cursor-pointer">
+            <p className="text-[13px] font-semibold truncate hover:text-primary transition-colors">
+              {lead.vorname} {lead.nachname}
+            </p>
+            {lead.unternehmen && (
+              <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                <Building2 className="h-2.5 w-2.5 shrink-0" />
+                {lead.unternehmen}
+              </p>
             )}
           </div>
+          <PrioBadge prio={lead.prioritaet} />
         </div>
 
-        {/* Overdue Warning */}
+        {/* Value + Time */}
+        <div className="flex items-center justify-between">
+          {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 ? (
+            <span className="text-[12px] font-bold text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
+          ) : (
+            <span />
+          )}
+          <div className="flex items-center gap-1.5">
+            {ff !== 'unbekannt' && (
+              <span className={`text-[9px] ${ffInfo.color}`}>●</span>
+            )}
+            <span className="text-[10px] text-muted-foreground/60 num">
+              {formatRelativeTime(lead.created_at)}
+            </span>
+          </div>
+        </div>
+
         {isOverdue && (
-          <div className="flex items-center gap-1.5 pl-5 text-destructive">
-            <AlertTriangle className="h-3 w-3" />
-            <span className="text-[11px] font-medium">Überfällig ({daysSince}d)</span>
+          <div className="flex items-center gap-1 text-destructive">
+            <AlertTriangle className="h-2.5 w-2.5" />
+            <span className="text-[10px] font-semibold">Überfällig</span>
           </div>
         )}
       </div>
@@ -123,76 +107,76 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
 function LeadCardOverlay({ lead }: { lead: Lead }) {
   return (
     <div className="drag-overlay w-[240px]">
-      <div className="lead-card p-3 bg-card border border-primary/20">
-        <p className="text-sm font-medium">{lead.vorname} {lead.nachname}</p>
-        {lead.unternehmen && <p className="text-xs text-muted-foreground">{lead.unternehmen}</p>}
+      <div className="lead-card p-3 bg-card border border-primary/20 space-y-1">
+        <p className="text-[13px] font-semibold">{lead.vorname} {lead.nachname}</p>
+        {lead.unternehmen && <p className="text-[10px] text-muted-foreground">{lead.unternehmen}</p>}
         {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-          <p className="text-sm font-semibold text-primary mt-1">{formatCurrency(lead.rechner_ergebnis)}</p>
+          <p className="text-[12px] font-bold text-primary num">{formatCurrency(lead.rechner_ergebnis)}</p>
         )}
       </div>
     </div>
   );
 }
 
-function DroppableColumn({ status, leads: columnLeads, isOver, convRate }: { status: string; leads: Lead[]; isOver: boolean; convRate?: number }) {
-  const { setNodeRef, isOver: dndIsOver } = useDroppable({ id: status });
-  const active = isOver || dndIsOver;
+function DroppableColumn({ status, leads: columnLeads, convRate }: { status: string; leads: Lead[]; convRate?: number }) {
+  const { setNodeRef, isOver } = useDroppable({ id: status });
   const columnValue = columnLeads.reduce((sum, l) => sum + (l.rechner_ergebnis || 0), 0);
+  const color = STATUS_HEX[status] || '#6B7280';
 
   return (
     <div
       ref={setNodeRef}
-      className={`pipeline-column flex flex-col w-[240px] md:w-[272px] shrink-0 snap-start ${active ? 'drag-over' : ''}`}
+      className={`pipeline-column flex flex-col w-[220px] md:w-[260px] shrink-0 snap-start ${isOver ? 'drag-over' : ''}`}
     >
       {/* Column Header */}
-      <div className="p-3 border-b border-border/50">
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${STATUS_COLORS[status] || 'bg-gray-500'}`} />
-            <span className="text-xs font-semibold truncate">{status}</span>
+      <div className="px-3 py-2.5 border-b border-border/30">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+            <span className="text-[11px] font-bold truncate">{status}</span>
           </div>
-          <span className="text-[11px] text-muted-foreground font-medium bg-muted rounded-full px-2 py-0.5 tabular-nums">
+          <span className="text-[10px] font-bold num rounded-full px-1.5 py-0.5 bg-muted/50 text-muted-foreground">
             {columnLeads.length}
           </span>
         </div>
-        <div className="flex items-center gap-2 pl-4">
-          {columnValue > 0 && (
-            <p className="text-[11px] text-muted-foreground">
-              {formatCurrency(columnValue)}
-            </p>
-          )}
-          {convRate !== undefined && convRate > 0 && (
-            <span className={`text-[10px] font-semibold tabular-nums ${
-              convRate >= 70 ? 'text-emerald-500' : convRate >= 40 ? 'text-amber-500' : 'text-red-400'
-            }`}>
-              {convRate}% Conv.
-            </span>
-          )}
-        </div>
+        {(columnValue > 0 || (convRate !== undefined && convRate > 0)) && (
+          <div className="flex items-center gap-2 mt-1 pl-4">
+            {columnValue > 0 && (
+              <span className="text-[10px] text-muted-foreground/70 num">{formatCurrency(columnValue)}</span>
+            )}
+            {convRate !== undefined && convRate > 0 && (
+              <span className={`text-[9px] font-bold num ${
+                convRate >= 70 ? 'text-emerald-400' : convRate >= 40 ? 'text-amber-400' : 'text-red-400'
+              }`}>
+                {convRate}%
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Cards */}
-      <div className="flex-1 p-2 space-y-2 overflow-y-auto">
+      <div className="flex-1 p-1.5 space-y-1.5 overflow-y-auto">
         <AnimatePresence mode="popLayout">
           {columnLeads.map((lead) => (
             <motion.div
               key={lead.id}
               layout
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.15 }}
             >
               <DraggableLeadCard lead={lead} />
             </motion.div>
           ))}
         </AnimatePresence>
         {columnLeads.length === 0 && (
-          <div className={`flex items-center justify-center py-8 rounded-lg border border-dashed transition-colors ${
-            active ? 'border-primary/30 bg-primary/[0.03]' : 'border-border/50'
+          <div className={`flex items-center justify-center py-10 rounded-lg border border-dashed transition-all ${
+            isOver ? 'border-primary/30 bg-primary/[0.02]' : 'border-border/30'
           }`}>
-            <p className="text-xs text-muted-foreground">
-              {active ? 'Hier ablegen' : 'Keine Leads'}
+            <p className="text-[10px] text-muted-foreground/50">
+              {isOver ? 'Ablegen' : 'Leer'}
             </p>
           </div>
         )}
@@ -207,41 +191,30 @@ export default function PipelinePage() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 200, tolerance: 5 },
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
-  const columns = useMemo(() => {
-    return PIPELINE_STATUSES.map(status => ({
-      status,
-      leads: leads.filter(l => l.status === status),
-    }));
-  }, [leads]);
+  const columns = useMemo(() => PIPELINE_STATUSES.map(status => ({
+    status,
+    leads: leads.filter(l => l.status === status),
+  })), [leads]);
 
   const activeLead = useMemo(() => leads.find(l => l.id === activeId), [leads, activeId]);
 
-  const closedLeads = useMemo(() =>
-    leads.filter(l => l.status === 'Kalt' || l.status === 'Nicht förderfähig' || l.status === 'Disqualifiziert'),
-    [leads]
-  );
-
   const totalPipeline = useMemo(() =>
-    leads
-      .filter(l => !['Kalt', 'Nicht förderfähig', 'Disqualifiziert', 'Mandat'].includes(l.status))
+    leads.filter(l => !['Kalt', 'Nicht förderfähig', 'Disqualifiziert', 'Mandat'].includes(l.status))
       .reduce((sum, l) => sum + (l.rechner_ergebnis || 0), 0),
-    [leads]
-  );
+    [leads]);
 
   const totalMandate = useMemo(() =>
     leads.filter(l => l.status === 'Mandat').reduce((sum, l) => sum + (l.mandats_wert || 0), 0),
-    [leads]
-  );
+    [leads]);
 
-  // Conversion rates between columns — must be before early return (Rules of Hooks)
+  const closedCount = useMemo(() =>
+    leads.filter(l => ['Kalt', 'Nicht förderfähig', 'Disqualifiziert'].includes(l.status)).length,
+    [leads]);
+
   const conversionRates = useMemo(() => {
     const rates: Record<string, number> = {};
     for (let i = 1; i < columns.length; i++) {
@@ -255,14 +228,11 @@ export default function PipelinePage() {
     return rates;
   }, [columns, leads]);
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
+  const handleDragStart = (event: DragStartEvent) => setActiveId(event.active.id as string);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
-
     if (over && active.id !== over.id) {
       const targetStatus = over.id as string;
       if (PIPELINE_STATUSES.includes(targetStatus)) {
@@ -275,71 +245,68 @@ export default function PipelinePage() {
     return (
       <div className="space-y-4">
         <div className="h-8 w-48 skeleton-shimmer" />
-        <div className="flex gap-3 overflow-x-auto pb-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="w-[272px] h-[400px] skeleton-shimmer shrink-0" />
-          ))}
+        <div className="flex gap-2 overflow-x-auto pb-4">
+          {[...Array(5)].map((_, i) => <div key={i} className="w-[260px] h-[400px] skeleton-shimmer shrink-0" />)}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 md:space-y-5">
+    <div className="space-y-3 md:space-y-4">
       {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-3"
       >
         <div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight">Pipeline</h1>
-          <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
-            <span className="hidden md:inline">Leads per Drag & Drop durch die Pipeline bewegen</span>
-            <span className="md:hidden">Tippen & Halten zum Verschieben</span>
+          <h1 className="text-xl md:text-2xl font-black tracking-tight">Pipeline</h1>
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            <span className="hidden md:inline">Drag & Drop zum Verschieben</span>
+            <span className="md:hidden">Halten & Ziehen</span>
           </p>
         </div>
-        <div className="flex items-center gap-3 md:gap-5 overflow-x-auto">
-          <div className="flex items-center gap-2 shrink-0">
-            <TrendingUp className="h-4 w-4 text-muted-foreground hidden md:block" />
-            <div className="text-right">
-              <p className="text-[10px] md:text-xs text-muted-foreground">Pipeline</p>
-              <p className="text-xs md:text-sm font-bold tabular-nums">{formatCurrency(totalPipeline)}</p>
-            </div>
+        <div className="flex items-center gap-4 md:gap-6">
+          <div className="text-right">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-semibold">Pipeline</p>
+            <p className="text-sm md:text-base font-black num">{formatCurrency(totalPipeline)}</p>
           </div>
-          <div className="h-6 md:h-8 w-px bg-border shrink-0" />
-          <div className="text-right shrink-0">
-            <p className="text-[10px] md:text-xs text-muted-foreground">Mandate</p>
-            <p className="text-xs md:text-sm font-bold text-emerald-500 tabular-nums">{formatCurrency(totalMandate)}</p>
+          <div className="h-6 w-px bg-border/50" />
+          <div className="text-right">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-semibold">Mandate</p>
+            <p className="text-sm md:text-base font-black text-emerald-400 num">{formatCurrency(totalMandate)}</p>
           </div>
-          <div className="h-6 md:h-8 w-px bg-border shrink-0" />
-          <div className="text-right shrink-0">
-            <p className="text-[10px] md:text-xs text-muted-foreground">Verloren</p>
-            <p className="text-xs md:text-sm font-bold text-destructive tabular-nums">{closedLeads.length}</p>
+          <div className="h-6 w-px bg-border/50" />
+          <div className="text-right">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/60 font-semibold">Verloren</p>
+            <p className="text-sm md:text-base font-black text-destructive num">{closedCount}</p>
           </div>
         </div>
       </motion.div>
 
-      {/* Pipeline Board */}
+      {/* Kanban Board */}
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-2 md:gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-2 md:px-2 snap-x snap-mandatory md:snap-none" style={{ minHeight: 'calc(100vh - 240px)' }}>
+        <div
+          className="flex gap-2 overflow-x-auto pb-4 -mx-4 px-4 md:-mx-2 md:px-2 snap-x snap-mandatory md:snap-none"
+          style={{ minHeight: 'calc(100vh - 200px)' }}
+        >
           {columns.map(col => (
             <DroppableColumn
               key={col.status}
               status={col.status}
               leads={col.leads}
-              isOver={false}
               convRate={conversionRates[col.status]}
             />
           ))}
         </div>
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeLead ? <LeadCardOverlay lead={activeLead} /> : null}
         </DragOverlay>
       </DndContext>

@@ -210,7 +210,7 @@ export default function LeadDetail() {
                 </div>
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg md:text-xl font-bold tracking-tight truncate">{lead.vorname} {lead.nachname}</h1>
+                <h1 className="text-lg md:text-xl font-black tracking-tight truncate">{lead.vorname} {lead.nachname}</h1>
                 <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
                   <Building2 className="h-3.5 w-3.5 shrink-0" />
                   {lead.unternehmen || 'Kein Unternehmen'}
@@ -391,7 +391,7 @@ export default function LeadDetail() {
                 <div className="py-1"><p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Branche</p><p className="text-sm">{lead.branche || '–'}</p></div>
                 <div className="py-1 pt-2 border-t border-border/30">
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Förderpotenzial</p>
-                  <p className="text-2xl font-extrabold gradient-text mt-1">{formatCurrency(lead.rechner_ergebnis)}</p>
+                  <p className="text-2xl font-black gradient-text mt-1 num">{formatCurrency(lead.rechner_ergebnis)}</p>
                 </div>
               </CardContent>
             </Card>
