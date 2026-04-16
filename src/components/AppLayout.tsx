@@ -108,6 +108,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <LogOut className="h-[18px] w-[18px] shrink-0" />
             <span className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap">Abmelden</span>
           </button>
+
+          {/* Agency branding */}
+          <a
+            href="https://mtmstudios.de"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 mt-2 border-t border-border/30 pt-3 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 hover:opacity-80"
+          >
+            <div className="h-5 w-5 rounded bg-[#000] flex items-center justify-center shrink-0">
+              <span className="text-[#00E5C0] text-[7px] font-black leading-none">MTM</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground/50 whitespace-nowrap">powered by MTM Studios</span>
+          </a>
         </div>
       </aside>
 

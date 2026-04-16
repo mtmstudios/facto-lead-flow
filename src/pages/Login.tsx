@@ -141,10 +141,22 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Footer */}
-          <p className="text-center text-xs text-muted-foreground/40 mt-8">
-            factonet Holding GmbH
-          </p>
+          {/* Footer — Agency branding */}
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <span className="text-[11px] text-muted-foreground/30">powered by</span>
+            <a
+              href="https://mtmstudios.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors"
+            >
+              {/* Logo placeholder — replace with <img> via Lovable */}
+              <div className="h-4 w-4 rounded bg-[#000] dark:bg-white/10 flex items-center justify-center shrink-0">
+                <span className="text-[#00E5C0] text-[5px] font-black leading-none">MTM</span>
+              </div>
+              <span className="text-[11px] font-semibold">MTM Studios</span>
+            </a>
+          </div>
         </motion.div>
       </div>
     </div>
