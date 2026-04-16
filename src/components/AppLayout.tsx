@@ -71,7 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   {item.label}
                 </span>
                 {isActive && (
-                  <kbd className="ml-auto opacity-0 group-hover/sidebar:opacity-50 transition-opacity duration-200 text-[9px] font-mono bg-muted rounded px-1 py-0.5">
+                  <kbd className="ml-auto opacity-0 group-hover/sidebar:opacity-50 transition-opacity duration-200 text-[10px] font-mono bg-muted rounded px-1 py-0.5">
                     {item.shortcut}
                   </kbd>
                 )}
@@ -97,7 +97,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
-              <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <item.icon className={cn('h-5 w-5 transition-transform', isActive && 'scale-110')} />
-                <span className={cn('text-[10px] font-medium', isActive && 'font-bold')}>{item.label}</span>
+                <span className={cn('text-xs font-medium', isActive && 'font-bold')}>{item.label}</span>
                 {isActive && (
                   <motion.div
                     layoutId="mobile-nav"

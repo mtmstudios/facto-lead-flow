@@ -2,14 +2,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLead, useLeadAktivitaeten, useUpdateLead, useDeleteLead, useCreateAktivitaet } from '@/hooks/useLeads';
 import { StatusBadge, PrioBadge } from '@/components/Badges';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { LEAD_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
-import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Tag, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
@@ -18,40 +18,33 @@ const ICON_MAP: Record<string, React.ElementType> = {
   'Anruf': PhoneCall, 'E-Mail': MailIcon, 'Notiz': FileText, 'Statusänderung': RotateCcw, 'Termin': Calendar, 'Fragenkatalog': FileText,
 };
 
-const containerVariants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-};
-const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] } },
-};
+type Tab = 'uebersicht' | 'fragenkatalog' | 'aktivitaeten';
 
 function BoolField({ label, field, value, onUpdate }: { label: string; field: string; value: boolean | null; onUpdate: (field: string, value: boolean | null) => void }) {
   return (
-    <div className="flex items-start justify-between gap-3 py-2 border-b border-border/30 last:border-0">
-      <p className="text-xs text-muted-foreground flex-1 leading-relaxed">{label}</p>
+    <div className="flex items-start justify-between gap-3 py-2.5 border-b border-border/30 last:border-0">
+      <p className="text-sm text-foreground/80 flex-1 leading-relaxed">{label}</p>
       <div className="flex gap-1 shrink-0">
         <button
           onClick={() => onUpdate(field, true)}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === true
-              ? 'bg-emerald-500/15 text-emerald-500 ring-1 ring-emerald-500/20'
+              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20'
               : 'bg-muted text-muted-foreground hover:bg-accent'
           }`}
         >
-          <CheckCircle2 className="h-3 w-3" />
+          <CheckCircle2 className="h-3.5 w-3.5" />
           Ja
         </button>
         <button
           onClick={() => onUpdate(field, false)}
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+          className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === false
-              ? 'bg-red-500/15 text-red-500 ring-1 ring-red-500/20'
+              ? 'bg-red-500/15 text-red-600 dark:text-red-400 ring-1 ring-red-500/20'
               : 'bg-muted text-muted-foreground hover:bg-accent'
           }`}
         >
-          <XCircle className="h-3 w-3" />
+          <XCircle className="h-3.5 w-3.5" />
           Nein
         </button>
       </div>
@@ -69,6 +62,7 @@ export default function LeadDetail() {
   const deleteLead = useDeleteLead();
   const createAktivitaet = useCreateAktivitaet();
 
+  const [activeTab, setActiveTab] = useState<Tab>('uebersicht');
   const [aktTyp, setAktTyp] = useState('Notiz');
   const [aktBeschreibung, setAktBeschreibung] = useState('');
   const [editField, setEditField] = useState<string | null>(null);
@@ -101,21 +95,14 @@ export default function LeadDetail() {
 
   if (isLoading || !lead) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-4xl mx-auto">
         <div className="h-8 w-48 skeleton-shimmer" />
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 space-y-4">
-            <div className="h-48 skeleton-shimmer rounded-xl" />
-            <div className="h-64 skeleton-shimmer rounded-xl" />
-          </div>
-          <div className="lg:col-span-2 space-y-4">
-            <div className="h-48 skeleton-shimmer rounded-xl" />
-            <div className="h-48 skeleton-shimmer rounded-xl" />
-          </div>
-        </div>
+        <div className="h-48 skeleton-shimmer rounded-xl" />
+        <div className="h-64 skeleton-shimmer rounded-xl" />
       </div>
     );
   }
+
   const handleStatusChange = (status: string) => {
     const oldStatus = lead.status;
     updateLead.mutate({ id: lead.id, status });
@@ -137,424 +124,381 @@ export default function LeadDetail() {
     deleteLead.mutate(lead.id, { onSuccess: () => navigate('/leads') });
   };
 
-  const InlineField = ({ label, field, value, type = 'text', icon: Icon }: { label: string; field: string; value: string | number | null; type?: string; icon?: React.ElementType }) => {
+  const InlineField = ({ label, field, value, type = 'text' }: { label: string; field: string; value: string | number | null; type?: string }) => {
     if (editField === field) {
       return (
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-          <div className="flex gap-2">
-            <Input
-              type={type}
-              value={editValue}
-              onChange={e => setEditValue(e.target.value)}
-              className="h-8 text-sm bg-background/50"
-              autoFocus
-              onKeyDown={e => {
-                if (e.key === 'Enter') handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null);
-                if (e.key === 'Escape') setEditField(null);
-              }}
-            />
-            <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null)}>
-              <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-            </Button>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground w-28 shrink-0">{label}</span>
+          <Input
+            type={type}
+            value={editValue}
+            onChange={e => setEditValue(e.target.value)}
+            className="h-8 text-sm flex-1"
+            autoFocus
+            onKeyDown={e => {
+              if (e.key === 'Enter') handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null);
+              if (e.key === 'Escape') setEditField(null);
+            }}
+          />
+          <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null)}>
+            <CheckCircle2 className="h-4 w-4 text-primary" />
+          </Button>
         </div>
       );
     }
     return (
       <div
-        className="space-y-1 cursor-pointer group py-1"
+        className="flex items-center gap-2 cursor-pointer group py-0.5"
         onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
       >
-        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
-        <p className="text-sm group-hover:text-primary transition-colors flex items-center gap-1.5">
-          {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
-          {value || <span className="text-muted-foreground/50 italic">Klicken zum Bearbeiten</span>}
-        </p>
+        <span className="text-sm text-muted-foreground w-28 shrink-0">{label}</span>
+        <span className="text-sm group-hover:text-primary transition-colors">
+          {value || <span className="text-muted-foreground/40 italic">–</span>}
+        </span>
       </div>
     );
   };
 
-
+  const tabs: { key: Tab; label: string; count?: number }[] = [
+    { key: 'uebersicht', label: 'Übersicht' },
+    { key: 'fragenkatalog', label: 'Fragenkatalog' },
+    { key: 'aktivitaeten', label: 'Aktivitäten', count: aktivitaeten.length },
+  ];
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="space-y-5 md:space-y-6"
-    >
+    <div className="space-y-5 max-w-4xl mx-auto">
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-        <div className="flex items-start gap-3 md:gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-8 w-8 md:h-9 md:w-9 rounded-lg shrink-0">
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3">
-              {/* Lead Score Ring */}
-              <div className="relative h-12 w-12 md:h-14 md:w-14 shrink-0">
-                <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
-                  <circle
-                    cx="18" cy="18" r="15.5" fill="none"
-                    stroke={scoreColor}
-                    strokeWidth="2.5"
-                    strokeDasharray={`${leadScore} ${100 - leadScore}`}
-                    strokeLinecap="round"
-                    className="transition-all duration-1000 ease-out"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[11px] md:text-xs font-bold" style={{ color: scoreColor }}>{leadScore}</span>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/leads')} className="h-9 w-9 rounded-lg shrink-0">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <div className="flex items-center gap-3">
+                {/* Score */}
+                <div className="relative h-11 w-11 shrink-0">
+                  <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+                    <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
+                    <circle cx="18" cy="18" r="15.5" fill="none" stroke={scoreColor} strokeWidth="2.5"
+                      strokeDasharray={`${leadScore} ${100 - leadScore}`} strokeLinecap="round"
+                      className="transition-all duration-1000 ease-out" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold" style={{ color: scoreColor }}>{leadScore}</span>
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-lg md:text-xl font-black tracking-tight">{lead.vorname} {lead.nachname}</h1>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                    <Building2 className="h-3.5 w-3.5" />
+                    {lead.unternehmen || 'Kein Unternehmen'}
+                  </p>
                 </div>
               </div>
-              <div className="min-w-0">
-                <h1 className="text-lg md:text-xl font-black tracking-tight truncate">{lead.vorname} {lead.nachname}</h1>
-                <p className="text-xs md:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
-                  <Building2 className="h-3.5 w-3.5 shrink-0" />
-                  {lead.unternehmen || 'Kein Unternehmen'}
-                </p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <DropdownMenu>
+                  <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
+                  <DropdownMenuContent>{LEAD_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger><PrioBadge prio={lead.prioritaet} className="cursor-pointer" /></DropdownMenuTrigger>
+                  <DropdownMenuContent>{LEAD_PRIORITAETEN.map(p => <DropdownMenuItem key={p} onClick={() => updateLead.mutate({ id: lead.id, prioritaet: p })}>{p}</DropdownMenuItem>)}</DropdownMenuContent>
+                </DropdownMenu>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                  ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                  'bg-muted text-muted-foreground'
+                }`}>
+                  {ffInfo.label}
+                </span>
               </div>
-            </div>
-            <div className="flex items-center gap-2 mt-3 flex-wrap">
-              <DropdownMenu>
-                <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
-                <DropdownMenuContent>{LEAD_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
-              </DropdownMenu>
-              <DropdownMenu>
-                <DropdownMenuTrigger><PrioBadge prio={lead.prioritaet} className="cursor-pointer" /></DropdownMenuTrigger>
-                <DropdownMenuContent>{LEAD_PRIORITAETEN.map(p => <DropdownMenuItem key={p} onClick={() => updateLead.mutate({ id: lead.id, prioritaet: p })}>{p}</DropdownMenuItem>)}</DropdownMenuContent>
-              </DropdownMenu>
-              {/* Förderfähigkeit Indicator */}
-              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
-                ff === 'gelb' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
-                ff === 'rot' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
-                'bg-muted text-muted-foreground border border-border'
-              }`}>
-                {ff === 'gruen' && '●'}{ff === 'gelb' && '●'}{ff === 'rot' && '●'}{ff === 'unbekannt' && '○'} {ffInfo.label}
-              </span>
             </div>
           </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {lead.telefon && (
+              <Button variant="outline" size="sm" asChild className="h-9">
+                <a href={`tel:${lead.telefon}`}><Phone className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
+              </Button>
+            )}
+            {lead.email && (
+              <Button variant="outline" size="sm" asChild className="h-9">
+                <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
+              </Button>
+            )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="h-9"><Trash2 className="h-4 w-4" /></Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Lead löschen?</AlertDialogTitle>
+                  <AlertDialogDescription>Dieser Lead und alle Aktivitäten werden unwiderruflich gelöscht.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
-        <div className="flex items-center gap-2 ml-11 md:ml-0">
-          {lead.telefon && (
-            <Button variant="outline" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm">
-              <a href={`tel:${lead.telefon}`}><Phone className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
-            </Button>
-          )}
-          {lead.email && (
-            <Button variant="outline" size="sm" asChild className="h-8 md:h-9 text-xs md:text-sm">
-              <a href={`mailto:${lead.email}`}><Mail className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
-            </Button>
-          )}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" className="h-8 md:h-9 text-xs md:text-sm"><Trash2 className="h-3.5 w-3.5 md:mr-1.5" /><span className="hidden md:inline">Löschen</span></Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="glass-card">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Lead löschen?</AlertDialogTitle>
-                <AlertDialogDescription>Dieser Lead und alle zugehörigen Aktivitäten werden unwiderruflich gelöscht.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete}>Löschen</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-border/50">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2.5 text-sm font-medium transition-colors relative ${
+                activeTab === tab.key
+                  ? 'text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="ml-1.5 text-xs text-muted-foreground">({tab.count})</span>
+              )}
+              {activeTab === tab.key && (
+                <motion.div
+                  layoutId="detail-tab"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
+              )}
+            </button>
+          ))}
         </div>
       </motion.div>
 
-      {/* Two Columns — stacks on mobile */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
-        {/* On mobile: Info cards first, then timeline */}
-        {/* Timeline Column */}
-        <div className="lg:col-span-3 space-y-4 md:space-y-5 order-2 lg:order-1">
-          {/* Add Activity */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Aktivität hinzufügen</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex flex-wrap gap-1.5">
-                  {AKTIVITAET_TYPEN.filter(t => t !== 'Statusänderung').map(t => (
-                    <Button
-                      key={t}
-                      variant={aktTyp === t ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAktTyp(t)}
-                      className="h-7 text-xs"
-                    >
-                      {t}
-                    </Button>
-                  ))}
+      {/* Tab: Übersicht */}
+      {activeTab === 'uebersicht' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+          {/* Kontakt + Qualifizierung in einer Card */}
+          <Card className="glass-card">
+            <CardContent className="p-5 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Kontaktdaten */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold mb-3">Kontaktdaten</h3>
+                  <InlineField label="E-Mail" field="email" value={lead.email} type="email" />
+                  <InlineField label="Telefon" field="telefon" value={lead.telefon} />
+                  <InlineField label="Unternehmen" field="unternehmen" value={lead.unternehmen} />
+                  <InlineField label="Position" field="position_titel" value={lead.position_titel} />
+                  <InlineField label="Adresse" field="adresse" value={lead.adresse} />
+                  <InlineField label="PLZ / Ort" field="plz" value={lead.plz && lead.ort ? `${lead.plz} ${lead.ort}` : lead.plz || lead.ort} />
+                  <InlineField label="Homepage" field="homepage" value={lead.homepage} />
                 </div>
-                <Textarea
-                  placeholder="Was wurde besprochen / erledigt?"
-                  value={aktBeschreibung}
-                  onChange={e => setAktBeschreibung(e.target.value)}
-                  rows={3}
-                  className="bg-background/50"
-                />
-                <Button size="sm" onClick={handleSaveAktivitaet} disabled={!aktBeschreibung.trim()} className="h-8">
-                  Speichern
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Activity Timeline */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold">Aktivitäten ({aktivitaeten.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y divide-border/30">
-                  {aktivitaeten.map((akt, i) => {
-                    const Icon = ICON_MAP[akt.typ] || FileText;
-                    return (
-                      <motion.div
-                        key={akt.id}
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.03 }}
-                        className="flex gap-3 px-5 py-3.5 hover:bg-accent/30 transition-colors"
-                      >
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="h-8 w-8 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 ring-1 ring-primary/10">
-                            <Icon className="h-4 w-4 text-primary" />
-                          </div>
-                          {i < aktivitaeten.length - 1 && (
-                            <div className="w-px flex-1 bg-border/50 min-h-[8px]" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">{akt.typ}</span>
-                            <span className="text-[11px] text-muted-foreground">{formatDateTime(akt.created_at)}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-0.5">{akt.beschreibung}</p>
-                          {akt.erstellt_von && <p className="text-[11px] text-muted-foreground/70 mt-1">von {akt.erstellt_von}</p>}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                  {aktivitaeten.length === 0 && (
-                    <p className="px-5 py-12 text-center text-sm text-muted-foreground">Noch keine Aktivitäten</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Info Cards Column — shows first on mobile */}
-        <div className="lg:col-span-2 space-y-4 md:space-y-5 order-1 lg:order-2">
-          {/* Contact Data */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <User className="h-3.5 w-3.5 text-primary" /> Kontaktdaten
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <InlineField label="E-Mail" field="email" value={lead.email} type="email" icon={Mail} />
-                <InlineField label="Telefon" field="telefon" value={lead.telefon} icon={Phone} />
-                <InlineField label="Unternehmen" field="unternehmen" value={lead.unternehmen} icon={Building2} />
-                <InlineField label="Position" field="position_titel" value={lead.position_titel} icon={User} />
-                <InlineField label="Adresse" field="adresse" value={lead.adresse} icon={MapPin} />
-                <div className="grid grid-cols-2 gap-3">
-                  <InlineField label="PLZ" field="plz" value={lead.plz} />
-                  <InlineField label="Ort" field="ort" value={lead.ort} />
-                </div>
-                <InlineField label="Homepage" field="homepage" value={lead.homepage} icon={Globe} />
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Qualification */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5 text-primary" /> Qualifizierung
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="py-1"><p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Mitarbeiterzahl</p><p className="text-sm">{lead.mitarbeiter || '–'}</p></div>
-                <div className="py-1"><p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Entwicklungsaktivität</p><p className="text-sm">{lead.entwicklung || '–'}</p></div>
-                <div className="py-1"><p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Branche</p><p className="text-sm">{lead.branche || '–'}</p></div>
-                <div className="py-1 pt-2 border-t border-border/30">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Förderpotenzial</p>
-                  <p className="text-2xl font-black gradient-text mt-1 num">{formatCurrency(lead.rechner_ergebnis)}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Source & Tracking */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <Tag className="h-3.5 w-3.5 text-primary" /> Quelle & Tracking
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm">
-                <div className="py-1">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Quelle</p>
-                  <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground mt-1">
-                    {lead.quelle || '–'}
-                  </span>
-                </div>
-                {(lead.utm_source || lead.utm_medium || lead.utm_campaign || lead.utm_content) && (
-                  <div className="space-y-1.5 py-1 text-xs">
-                    {lead.utm_source && <div className="flex justify-between"><span className="text-muted-foreground">Source</span><span className="font-medium">{lead.utm_source}</span></div>}
-                    {lead.utm_medium && <div className="flex justify-between"><span className="text-muted-foreground">Medium</span><span className="font-medium">{lead.utm_medium}</span></div>}
-                    {lead.utm_campaign && <div className="flex justify-between"><span className="text-muted-foreground">Campaign</span><span className="font-medium">{lead.utm_campaign}</span></div>}
-                    {lead.utm_content && <div className="flex justify-between"><span className="text-muted-foreground">Content</span><span className="font-medium">{lead.utm_content}</span></div>}
+                {/* Qualifizierung + Vertrieb */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold mb-3">Qualifizierung</h3>
+                  <div className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm text-muted-foreground w-28 shrink-0">Mitarbeiter</span>
+                    <span className="text-sm">{lead.mitarbeiter || '–'}</span>
                   </div>
-                )}
-                <div className="py-1">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Erstellt am</p>
-                  <p className="flex items-center gap-1.5 mt-0.5"><Clock className="h-3.5 w-3.5 text-muted-foreground" />{formatDateTime(lead.created_at)}</p>
+                  <div className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm text-muted-foreground w-28 shrink-0">Entwicklung</span>
+                    <span className="text-sm">{lead.entwicklung || '–'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm text-muted-foreground w-28 shrink-0">Branche</span>
+                    <span className="text-sm">{lead.branche || '–'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm text-muted-foreground w-28 shrink-0">Quelle</span>
+                    <span className="text-sm">{lead.quelle || '–'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 py-0.5">
+                    <span className="text-sm text-muted-foreground w-28 shrink-0">Erstellt</span>
+                    <span className="text-sm text-muted-foreground">{formatDateTime(lead.created_at)}</span>
+                  </div>
+                  <div className="pt-3 mt-3 border-t border-border/30">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Förderpotenzial</span>
+                      <span className="text-xl font-black text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
+                    </div>
+                  </div>
+                  <div className="pt-2">
+                    <h3 className="text-sm font-bold mb-2 mt-3">Vertrieb</h3>
+                    <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />
+                    <InlineField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                    <InlineField label="Termin" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                    <InlineField label="Mandatswert" field="mandats_wert" value={lead.mandats_wert} type="number" />
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Sales */}
-          <motion.div variants={itemVariants}>
-            <Card className="glass-card">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <DollarSign className="h-3.5 w-3.5 text-primary" /> Vertrieb
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <InlineField label="Zugewiesen an" field="zugewiesen_an" value={lead.zugewiesen_an} icon={User} />
-                <InlineField label="Kontaktiert am" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" icon={Calendar} />
-                <InlineField label="Termin am" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" icon={Calendar} />
-                <InlineField label="Mandatswert (€)" field="mandats_wert" value={lead.mandats_wert} type="number" icon={DollarSign} />
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Fragenkatalog */}
-      <motion.div variants={itemVariants}>
-        <Card className="glass-card">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold">Ersteinschätzung — Fragenkatalog</CardTitle>
-              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-500' :
-                ff === 'gelb' ? 'bg-amber-500/10 text-amber-400' :
-                ff === 'rot' ? 'bg-red-500/10 text-red-400' :
-                'bg-muted text-muted-foreground'
-              }`}>
-                {ff === 'gruen' && '●'}{ff === 'gelb' && '●'}{ff === 'rot' && '●'}{ff === 'unbekannt' && '○'} {ffInfo.label}
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-1">
-                <BoolField label="Ist das Unternehmen in Deutschland steuerpflichtig?" field="steuerpflichtig_de" value={lead.steuerpflichtig_de} onUpdate={handleInlineEdit} />
-                <BoolField label="Ist das Unternehmen in Schwierigkeiten? (mind. halbes EK aufgebraucht)" field="unternehmen_schwierigkeiten" value={lead.unternehmen_schwierigkeiten} onUpdate={handleInlineEdit} />
-                <BoolField label="Gibt es verbundene Unternehmen (Konzernstruktur)?" field="verbundene_unternehmen" value={lead.verbundene_unternehmen} onUpdate={handleInlineEdit} />
-                <BoolField label="Handelt es sich um eine reine Produktentwicklung?" field="reine_produktentwicklung" value={lead.reine_produktentwicklung} onUpdate={handleInlineEdit} />
-                <BoolField label="Bestehen wissenschaftliche/methodische Risiken?" field="wissenschaftliche_risiken" value={lead.wissenschaftliche_risiken} onUpdate={handleInlineEdit} />
-                <BoolField label="Arbeiten Auftragnehmer mit (nicht routinemäßig)?" field="auftragnehmer_beteiligt" value={lead.auftragnehmer_beteiligt} onUpdate={handleInlineEdit} />
               </div>
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Herausforderungen der Entwicklung</p>
-                  <Textarea
-                    value={lead.entwicklung_herausforderungen || ''}
-                    placeholder="Welche Herausforderungen sollen bewältigt werden?"
-                    rows={3}
-                    className="text-sm bg-background/50"
-                    onBlur={e => { if (e.target.value !== (lead.entwicklung_herausforderungen || '')) handleInlineEdit('entwicklung_herausforderungen', e.target.value || null); }}
-                    onChange={() => {}}
-                    defaultValue={lead.entwicklung_herausforderungen || ''}
-                  />
+            </CardContent>
+          </Card>
+
+          {/* Notizen */}
+          <Card className="glass-card">
+            <CardContent className="p-5 md:p-6">
+              <h3 className="text-sm font-bold mb-3">Notizen</h3>
+              <Textarea
+                placeholder="Freitext-Notizen..."
+                rows={3}
+                className="text-sm"
+                onBlur={e => { if (e.target.value !== (lead.notizen || '')) handleInlineEdit('notizen', e.target.value || null); }}
+                onChange={() => {}}
+                defaultValue={lead.notizen || ''}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Tab: Fragenkatalog */}
+      {activeTab === 'fragenkatalog' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <Card className="glass-card">
+            <CardContent className="p-5 md:p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-sm font-bold">Ersteinschätzung</h3>
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                  ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                  'bg-muted text-muted-foreground'
+                }`}>
+                  {ffInfo.label}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-0">
+                  <BoolField label="Unternehmen in Deutschland steuerpflichtig?" field="steuerpflichtig_de" value={lead.steuerpflichtig_de} onUpdate={handleInlineEdit} />
+                  <BoolField label="Unternehmen in Schwierigkeiten?" field="unternehmen_schwierigkeiten" value={lead.unternehmen_schwierigkeiten} onUpdate={handleInlineEdit} />
+                  <BoolField label="Verbundene Unternehmen?" field="verbundene_unternehmen" value={lead.verbundene_unternehmen} onUpdate={handleInlineEdit} />
+                  <BoolField label="Reine Produktentwicklung?" field="reine_produktentwicklung" value={lead.reine_produktentwicklung} onUpdate={handleInlineEdit} />
+                  <BoolField label="Wissenschaftliche Risiken?" field="wissenschaftliche_risiken" value={lead.wissenschaftliche_risiken} onUpdate={handleInlineEdit} />
+                  <BoolField label="Auftragnehmer beteiligt?" field="auftragnehmer_beteiligt" value={lead.auftragnehmer_beteiligt} onUpdate={handleInlineEdit} />
                 </div>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Entwicklungsplan / Meilensteine</p>
-                  <Textarea
-                    value={lead.entwicklungsplan || ''}
-                    placeholder="Arbeitsplan, Meilensteine..."
-                    rows={2}
-                    className="text-sm bg-background/50"
-                    onBlur={e => { if (e.target.value !== (lead.entwicklungsplan || '')) handleInlineEdit('entwicklungsplan', e.target.value || null); }}
-                    onChange={() => {}}
-                    defaultValue={lead.entwicklungsplan || ''}
-                  />
-                </div>
-                {lead.auftragnehmer_beteiligt && (
-                  <div className="space-y-1.5">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Aufgabe der Auftragnehmer</p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1.5">Herausforderungen</label>
                     <Textarea
-                      placeholder="Was ist die Aufgabenstellung?"
-                      rows={2}
-                      className="text-sm bg-background/50"
-                      onBlur={e => { if (e.target.value !== (lead.auftragnehmer_aufgabe || '')) handleInlineEdit('auftragnehmer_aufgabe', e.target.value || null); }}
+                      placeholder="Welche Herausforderungen?"
+                      rows={3}
+                      className="text-sm"
+                      onBlur={e => { if (e.target.value !== (lead.entwicklung_herausforderungen || '')) handleInlineEdit('entwicklung_herausforderungen', e.target.value || null); }}
                       onChange={() => {}}
-                      defaultValue={lead.auftragnehmer_aufgabe || ''}
+                      defaultValue={lead.entwicklung_herausforderungen || ''}
                     />
                   </div>
-                )}
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Entwicklungsaufwand (letzte 4 Jahre)</p>
-                  <Select value={lead.entwicklungsaufwand_4j || ''} onValueChange={v => handleInlineEdit('entwicklungsaufwand_4j', v)}>
-                    <SelectTrigger className="text-sm bg-background/50"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
-                    <SelectContent>
-                      {ENTWICKLUNGSAUFWAND_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Mitarbeiter in Entwicklung eingesetzt</p>
-                  <Select value={lead.ma_in_entwicklung || ''} onValueChange={v => handleInlineEdit('ma_in_entwicklung', v)}>
-                    <SelectTrigger className="text-sm bg-background/50"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
-                    <SelectContent>
-                      {MA_ENTWICKLUNG_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1.5">Entwicklungsplan</label>
+                    <Textarea
+                      placeholder="Meilensteine..."
+                      rows={2}
+                      className="text-sm"
+                      onBlur={e => { if (e.target.value !== (lead.entwicklungsplan || '')) handleInlineEdit('entwicklungsplan', e.target.value || null); }}
+                      onChange={() => {}}
+                      defaultValue={lead.entwicklungsplan || ''}
+                    />
+                  </div>
+                  {lead.auftragnehmer_beteiligt && (
+                    <div>
+                      <label className="text-sm text-muted-foreground block mb-1.5">Aufgabe der Auftragnehmer</label>
+                      <Textarea
+                        placeholder="Aufgabenstellung?"
+                        rows={2}
+                        className="text-sm"
+                        onBlur={e => { if (e.target.value !== (lead.auftragnehmer_aufgabe || '')) handleInlineEdit('auftragnehmer_aufgabe', e.target.value || null); }}
+                        onChange={() => {}}
+                        defaultValue={lead.auftragnehmer_aufgabe || ''}
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1.5">Entwicklungsaufwand (4 Jahre)</label>
+                    <Select value={lead.entwicklungsaufwand_4j || ''} onValueChange={v => handleInlineEdit('entwicklungsaufwand_4j', v)}>
+                      <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
+                      <SelectContent>
+                        {ENTWICKLUNGSAUFWAND_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground block mb-1.5">MA in Entwicklung</label>
+                    <Select value={lead.ma_in_entwicklung || ''} onValueChange={v => handleInlineEdit('ma_in_entwicklung', v)}>
+                      <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
+                      <SelectContent>
+                        {MA_ENTWICKLUNG_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
-      {/* Notizen */}
-      <motion.div variants={itemVariants}>
-        <Card className="glass-card">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-              <FileText className="h-3.5 w-3.5 text-primary" /> Notizen
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder="Freitext-Notizen..."
-              rows={4}
-              className="text-sm bg-background/50"
-              onBlur={e => { if (e.target.value !== (lead.notizen || '')) handleInlineEdit('notizen', e.target.value || null); }}
-              onChange={() => {}}
-              defaultValue={lead.notizen || ''}
-            />
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+      {/* Tab: Aktivitäten */}
+      {activeTab === 'aktivitaeten' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+          {/* Neue Aktivität */}
+          <Card className="glass-card">
+            <CardContent className="p-5">
+              <h3 className="text-sm font-bold mb-3">Aktivität hinzufügen</h3>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {AKTIVITAET_TYPEN.filter(t => t !== 'Statusänderung').map(t => (
+                  <Button
+                    key={t}
+                    variant={aktTyp === t ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setAktTyp(t)}
+                    className="h-8 text-xs"
+                  >
+                    {t}
+                  </Button>
+                ))}
+              </div>
+              <Textarea
+                placeholder="Was wurde besprochen / erledigt?"
+                value={aktBeschreibung}
+                onChange={e => setAktBeschreibung(e.target.value)}
+                rows={3}
+                className="text-sm"
+              />
+              <Button size="sm" onClick={handleSaveAktivitaet} disabled={!aktBeschreibung.trim()} className="h-9 mt-3">
+                Speichern
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Timeline */}
+          <Card className="glass-card">
+            <CardContent className="p-0">
+              <div className="divide-y divide-border/30">
+                {aktivitaeten.map((akt, i) => {
+                  const Icon = ICON_MAP[akt.typ] || FileText;
+                  return (
+                    <div key={akt.id} className="flex gap-3 px-5 py-4">
+                      <div className="h-8 w-8 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 ring-1 ring-primary/10">
+                        <Icon className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{akt.typ}</span>
+                          <span className="text-xs text-muted-foreground">{formatDateTime(akt.created_at)}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-0.5">{akt.beschreibung}</p>
+                        {akt.erstellt_von && <p className="text-xs text-muted-foreground/60 mt-1">von {akt.erstellt_von}</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+                {aktivitaeten.length === 0 && (
+                  <p className="px-5 py-12 text-center text-sm text-muted-foreground">Noch keine Aktivitäten</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </div>
   );
 }
