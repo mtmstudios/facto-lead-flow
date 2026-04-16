@@ -230,7 +230,7 @@ export default function PipelinePage() {
           <div className="h-6 w-px bg-border" />
           <div className="text-right">
             <p className="text-xs text-muted-foreground font-medium">Mandate</p>
-            <p className="text-base font-black text-emerald-600 dark:text-emerald-400 num">{formatCurrency(totalMandate)}</p>
+            <p className="text-base font-black text-emerald-600 num">{formatCurrency(totalMandate)}</p>
           </div>
         </div>
       </motion.div>

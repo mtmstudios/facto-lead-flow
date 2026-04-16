@@ -1,8 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
-import { LayoutDashboard, Users, Kanban, LogOut, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, Kanban, LogOut } from 'lucide-react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import logoImg from '@/assets/logo.png';
@@ -15,7 +14,6 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -82,16 +80,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Bottom */}
         <div className="p-3 space-y-1 relative">
-          <button
-            onClick={toggleTheme}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
-          >
-            {theme === 'dark' ? <Sun className="h-[18px] w-[18px] shrink-0" /> : <Moon className="h-[18px] w-[18px] shrink-0" />}
-            <span className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-              {theme === 'dark' ? 'Light' : 'Dark'}
-            </span>
-          </button>
-
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 ring-1 ring-primary/15">
               {user?.email?.[0]?.toUpperCase() || 'U'}
@@ -131,14 +119,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2.5">
             <img src={logoImg} alt="factonet" className="h-7 w-auto" />
           </div>
-          <div className="flex items-center gap-2">
-            <button onClick={toggleTheme} className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
-              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            <button onClick={signOut} className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/8 transition-colors">
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
+          <button onClick={signOut} className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/8 transition-colors">
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
 
         <div className="p-4 md:p-8">

@@ -151,7 +151,7 @@ export default function LoginPage() {
               className="flex items-center gap-1.5 text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors"
             >
               {/* Logo placeholder — replace with <img> via Lovable */}
-              <div className="h-4 w-4 rounded bg-[#000] dark:bg-white/10 flex items-center justify-center shrink-0">
+              <div className="h-4 w-4 rounded bg-[#000] flex items-center justify-center shrink-0">
                 <span className="text-[#00E5C0] text-[5px] font-black leading-none">MTM</span>
               </div>
               <span className="text-[11px] font-semibold">MTM Studios</span>

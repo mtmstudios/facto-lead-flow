@@ -29,7 +29,7 @@ function BoolField({ label, field, value, onUpdate }: { label: string; field: st
           onClick={() => onUpdate(field, true)}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === true
-              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20'
+              ? 'bg-emerald-500/15 text-emerald-600 ring-1 ring-emerald-500/20'
               : 'bg-muted text-muted-foreground hover:bg-accent'
           }`}
         >
@@ -40,7 +40,7 @@ function BoolField({ label, field, value, onUpdate }: { label: string; field: st
           onClick={() => onUpdate(field, false)}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === false
-              ? 'bg-red-500/15 text-red-600 dark:text-red-400 ring-1 ring-red-500/20'
+              ? 'bg-red-500/15 text-red-600 ring-1 ring-red-500/20'
               : 'bg-muted text-muted-foreground hover:bg-accent'
           }`}
         >
@@ -208,9 +208,9 @@ export default function LeadDetail() {
                     <DropdownMenuContent>{LEAD_PRIORITAETEN.map(p => <DropdownMenuItem key={p} onClick={() => updateLead.mutate({ id: lead.id, prioritaet: p })}>{p}</DropdownMenuItem>)}</DropdownMenuContent>
                   </DropdownMenu>
                   <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] md:text-xs font-medium ${
-                    ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                    ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
-                    ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                    ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600' :
+                    ff === 'gelb' ? 'bg-amber-500/10 text-amber-600' :
+                    ff === 'rot' ? 'bg-red-500/10 text-red-600' :
                     'bg-muted text-muted-foreground'
                   }`}>
                     {ffInfo.label}
@@ -360,9 +360,9 @@ export default function LeadDetail() {
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-bold">Ersteinschätzung</h3>
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
-                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
-                  ff === 'rot' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600' :
+                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600' :
+                  ff === 'rot' ? 'bg-red-500/10 text-red-600' :
                   'bg-muted text-muted-foreground'
                 }`}>
                   {ffInfo.label}
