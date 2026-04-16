@@ -149,7 +149,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 {isActive && (
                   <motion.div
                     layoutId="mobile-nav"
-                    className="absolute -top-px left-1/2 -translate-x-1/2 h-[2px] w-10 rounded-full bg-primary"
+                    className="absolute -top-px inset-x-0 mx-auto h-[2px] w-10 rounded-full bg-primary"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
