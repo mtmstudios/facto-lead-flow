@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useLeads } from '@/hooks/useLeads';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/Badges';
 import { formatCurrency, formatRelativeTime, isOverdue } from '@/lib/constants';
 import { UserPlus, Phone, CalendarDays, Award, ArrowRight, AlertTriangle, ChevronRight } from 'lucide-react';
