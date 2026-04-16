@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { LayoutDashboard, Users, Kanban, LogOut, Sun, Moon } from 'lucide-react';
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import logoImg from '@/assets/logo.png';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', shortcut: 'D' },
