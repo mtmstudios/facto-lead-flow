@@ -166,7 +166,7 @@ export default function LeadDetail() {
   ];
 
   return (
-    <div className="space-y-5 max-w-4xl mx-auto">
+    <div className="space-y-5 max-w-4xl mx-auto w-full min-w-0">
       {/* Header */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
         {/* Mobile: stacked layout, Desktop: side by side */}
