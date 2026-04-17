@@ -286,6 +286,8 @@ export default function LeadDetail() {
                 {/* Kontaktdaten */}
                 <div className="space-y-2">
                   <h3 className="text-sm font-bold mb-3">Kontaktdaten</h3>
+                  <InlineField label="Vorname" field="vorname" value={lead.vorname} />
+                  <InlineField label="Nachname" field="nachname" value={lead.nachname} />
                   <InlineField label="E-Mail" field="email" value={lead.email} type="email" />
                   <InlineField label="Telefon" field="telefon" value={lead.telefon} />
                   <InlineField label="Unternehmen" field="unternehmen" value={lead.unternehmen} />
