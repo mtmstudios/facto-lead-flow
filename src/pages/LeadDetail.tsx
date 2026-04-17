@@ -471,7 +471,7 @@ export default function LeadDetail() {
                 value={aktBeschreibung}
                 onChange={e => setAktBeschreibung(e.target.value)}
                 rows={3}
-                className="text-sm"
+                className="text-sm resize-none w-full min-w-0"
               />
               <Button size="sm" onClick={handleSaveAktivitaet} disabled={!aktBeschreibung.trim()} className="h-9 mt-3">
                 Speichern
