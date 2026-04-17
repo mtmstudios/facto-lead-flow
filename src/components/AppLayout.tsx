@@ -69,11 +69,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <span className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 whitespace-nowrap overflow-hidden">
                   {item.label}
                 </span>
-                {isActive && (
-                  <kbd className="ml-auto opacity-0 group-hover/sidebar:opacity-50 transition-opacity duration-200 text-[10px] font-mono bg-muted rounded px-1 py-0.5">
-                    {item.shortcut}
-                  </kbd>
-                )}
               </NavLink>
             );
           })}
