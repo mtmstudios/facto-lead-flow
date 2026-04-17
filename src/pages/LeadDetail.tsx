@@ -166,7 +166,7 @@ export default function LeadDetail() {
   ];
 
   return (
-    <div className="space-y-5 max-w-4xl mx-auto">
+    <div className="space-y-5 max-w-4xl mx-auto w-full min-w-0">
       {/* Header */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
         {/* Mobile: stacked layout, Desktop: side by side */}
@@ -471,7 +471,7 @@ export default function LeadDetail() {
                 value={aktBeschreibung}
                 onChange={e => setAktBeschreibung(e.target.value)}
                 rows={3}
-                className="text-sm"
+                className="text-sm resize-none w-full min-w-0"
               />
               <Button size="sm" onClick={handleSaveAktivitaet} disabled={!aktBeschreibung.trim()} className="h-9 mt-3">
                 Speichern
