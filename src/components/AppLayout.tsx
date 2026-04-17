@@ -109,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
+      <main className="flex-1 overflow-x-hidden overflow-y-auto pb-20 md:pb-0 min-w-0">
         {/* Mobile Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-border/50 bg-card/80 backdrop-blur-xl sticky top-0 z-30">
           <div className="flex items-center gap-2.5">
