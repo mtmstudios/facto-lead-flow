@@ -3,7 +3,7 @@ import { useLeads } from '@/hooks/useLeads';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/Badges';
-import { formatCurrency, formatRelativeTime, isOverdue } from '@/lib/constants';
+import { formatRelativeTime, isOverdue } from '@/lib/constants';
 import { UserPlus, Phone, CalendarDays, Award, ArrowRight, AlertTriangle, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -62,8 +62,7 @@ export default function DashboardPage() {
     const kontaktiertCount = leads.filter(l => l.status !== 'Neu').length;
     const termineCount = leads.filter(l => ['Erstgespräch geplant', 'Erstgespräch durchgeführt', 'Qualifiziert', 'Mandat'].includes(l.status)).length;
     const mandateCount = leads.filter(l => l.status === 'Mandat').length;
-    const mandateUmsatz = leads.filter(l => l.status === 'Mandat').reduce((s, l) => s + (l.mandats_wert || 0), 0);
-    return { newThisMonth: thisMonth.length, kontaktiertCount, termineCount, mandateCount, mandateUmsatz };
+    return { newThisMonth: thisMonth.length, kontaktiertCount, termineCount, mandateCount };
   }, [leads]);
 
   const funnelData = useMemo(() => {
@@ -81,12 +80,6 @@ export default function DashboardPage() {
 
   const overdueLeads = useMemo(() => leads.filter(isOverdue), [leads]);
   const recentLeads = useMemo(() => leads.slice(0, 5), [leads]);
-
-  const totalPipelineValue = useMemo(() =>
-    leads.filter(l => !['Kalt', 'Nicht förderfähig', 'Disqualifiziert'].includes(l.status))
-      .reduce((s, l) => s + (l.rechner_ergebnis || 0), 0),
-    [leads]
-  );
 
   if (isLoading) {
     return (
@@ -107,8 +100,6 @@ export default function DashboardPage() {
           <h1 className="text-xl md:text-2xl font-black tracking-tight">Lead-Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">
             <span className="num">{leads.length} Leads</span>
-            <span className="mx-2 text-border">|</span>
-            <span className="num">{formatCurrency(totalPipelineValue)} Pipeline</span>
           </p>
         </div>
       </motion.div>
@@ -135,7 +126,7 @@ export default function DashboardPage() {
         <KPICard title="Neue Leads" value={stats.newThisMonth} subtitle="diesen Monat" icon={UserPlus} />
         <KPICard title="Kontaktiert" value={stats.kontaktiertCount} subtitle="bearbeitet" icon={Phone} />
         <KPICard title="Termine" value={stats.termineCount} subtitle="geplant / durchgeführt" icon={CalendarDays} />
-        <KPICard title="Mandate" value={stats.mandateCount} subtitle={formatCurrency(stats.mandateUmsatz)} icon={Award} />
+        <KPICard title="Mandate" value={stats.mandateCount} subtitle="gewonnen" icon={Award} />
       </div>
 
       {/* Funnel — 5 Stufen */}
@@ -201,9 +192,6 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground truncate">{lead.unternehmen || '–'}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
-                    {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-                      <span className="text-xs font-bold text-primary num hidden sm:block">{formatCurrency(lead.rechner_ergebnis)}</span>
-                    )}
                     <StatusBadge status={lead.status} />
                     <ChevronRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary/50 transition-colors" />
                   </div>

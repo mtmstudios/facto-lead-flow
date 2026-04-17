@@ -317,12 +317,17 @@ export default function LeadDetail() {
                     <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Erstellt</span>
                     <span className="text-sm text-muted-foreground">{formatDateTime(lead.created_at)}</span>
                   </div>
-                  <div className="pt-3 mt-3 border-t border-border/30">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Förderpotenzial</span>
-                      <span className="text-xl font-black text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
+                  {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
+                    <div className="pt-3 mt-3 border-t border-border/30">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xs md:text-sm text-muted-foreground">Rechner-Schätzung</span>
+                          <p className="text-[10px] text-muted-foreground/40 mt-0.5">Indikativ, kein verbindlicher Wert</p>
+                        </div>
+                        <span className="text-base font-semibold text-muted-foreground num">{formatCurrency(lead.rechner_ergebnis)}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="pt-2">
                     <h3 className="text-sm font-bold mb-2 mt-3">Vertrieb</h3>
                     <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />

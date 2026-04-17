@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLeads, useUpdateLead, type Lead } from '@/hooks/useLeads';
-import { formatCurrency, formatRelativeTime } from '@/lib/constants';
+import { formatRelativeTime } from '@/lib/constants';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -71,9 +71,6 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
           {isOverdue && <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />}
         </div>
 
-        {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-          <p className="text-xs font-bold text-primary num mt-1.5">{formatCurrency(lead.rechner_ergebnis)}</p>
-        )}
       </div>
     </div>
   );
@@ -85,9 +82,6 @@ function LeadCardOverlay({ lead }: { lead: Lead }) {
       <div className="lead-card p-3 bg-card border border-primary/20">
         <p className="text-sm font-semibold">{lead.vorname} {lead.nachname}</p>
         {lead.unternehmen && <p className="text-xs text-muted-foreground mt-0.5">{lead.unternehmen}</p>}
-        {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-          <p className="text-xs font-bold text-primary num mt-1">{formatCurrency(lead.rechner_ergebnis)}</p>
-        )}
       </div>
     </div>
   );
@@ -97,7 +91,6 @@ function DroppableColumn({ columnKey, label, color, leads: columnLeads }: {
   columnKey: string; label: string; color: string; leads: Lead[];
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: columnKey });
-  const columnValue = columnLeads.reduce((sum, l) => sum + (l.rechner_ergebnis || 0), 0);
 
   return (
     <div
@@ -115,9 +108,6 @@ function DroppableColumn({ columnKey, label, color, leads: columnLeads }: {
             {columnLeads.length}
           </span>
         </div>
-        {columnValue > 0 && (
-          <p className="text-xs text-muted-foreground num mt-1 pl-[18px]">{formatCurrency(columnValue)}</p>
-        )}
       </div>
 
       {/* Cards */}
@@ -168,15 +158,6 @@ export default function PipelinePage() {
 
   const activeLead = useMemo(() => leads.find(l => l.id === activeId), [leads, activeId]);
 
-  const totalPipeline = useMemo(() =>
-    leads.filter(l => !['Kalt', 'Nicht förderfähig', 'Disqualifiziert', 'Mandat'].includes(l.status))
-      .reduce((sum, l) => sum + (l.rechner_ergebnis || 0), 0),
-    [leads]);
-
-  const totalMandate = useMemo(() =>
-    leads.filter(l => l.status === 'Mandat').reduce((sum, l) => sum + (l.mandats_wert || 0), 0),
-    [leads]);
-
   const handleDragStart = (event: DragStartEvent) => setActiveId(event.active.id as string);
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -221,17 +202,6 @@ export default function PipelinePage() {
             <span className="hidden md:inline">Drag & Drop zum Verschieben</span>
             <span className="md:hidden">Halten & Ziehen</span>
           </p>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground font-medium">Pipeline</p>
-            <p className="text-base font-black num">{formatCurrency(totalPipeline)}</p>
-          </div>
-          <div className="h-6 w-px bg-border" />
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground font-medium">Mandate</p>
-            <p className="text-base font-black text-emerald-600 num">{formatCurrency(totalMandate)}</p>
-          </div>
         </div>
       </motion.div>
 

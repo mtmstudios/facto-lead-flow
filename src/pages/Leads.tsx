@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatCurrency, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
+import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
 import { Plus, Download, X, ChevronUp, ChevronDown, Search, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
@@ -76,7 +76,7 @@ function NewLeadModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
   );
 }
 
-type SortKey = 'status' | 'name' | 'unternehmen' | 'rechner_ergebnis' | 'quelle' | 'created_at';
+type SortKey = 'status' | 'name' | 'unternehmen' | 'quelle' | 'created_at';
 
 export default function LeadsPage() {
   const { data: leads = [], isLoading } = useLeads();
@@ -118,7 +118,6 @@ export default function LeadsPage() {
       switch (sortKey) {
         case 'name': aVal = `${a.vorname} ${a.nachname}`; bVal = `${b.vorname} ${b.nachname}`; break;
         case 'unternehmen': aVal = a.unternehmen || ''; bVal = b.unternehmen || ''; break;
-        case 'rechner_ergebnis': aVal = a.rechner_ergebnis || 0; bVal = b.rechner_ergebnis || 0; break;
         case 'created_at': aVal = a.created_at; bVal = b.created_at; break;
         default: aVal = (a as Record<string, unknown>)[sortKey] as string || ''; bVal = (b as Record<string, unknown>)[sortKey] as string || '';
       }
@@ -150,11 +149,10 @@ export default function LeadsPage() {
 
   const exportCSV = () => {
     const BOM = '\uFEFF';
-    const headers = ['Status', 'Vorname', 'Nachname', 'Unternehmen', 'E-Mail', 'Telefon', 'Quelle', 'Potenzial', 'Erstellt'];
+    const headers = ['Status', 'Vorname', 'Nachname', 'Unternehmen', 'E-Mail', 'Telefon', 'Quelle', 'Erstellt'];
     const rows = filtered.map(l => [
       l.status, l.vorname, l.nachname, l.unternehmen || '', l.email || '', l.telefon || '',
-      l.quelle || '', l.rechner_ergebnis?.toString().replace('.', ',') || '',
-      new Date(l.created_at).toLocaleDateString('de-DE'),
+      l.quelle || '', new Date(l.created_at).toLocaleDateString('de-DE'),
     ]);
     const csv = BOM + [headers.join(';'), ...rows.map(r => r.map(v => `"${v}"`).join(';'))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -245,12 +243,7 @@ export default function LeadsPage() {
                   <p className="text-xs text-muted-foreground truncate mt-0.5">{lead.unternehmen}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-                  <span className="text-xs font-bold text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
-                )}
-                <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
-              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
             </div>
             <div className="flex items-center gap-2 mt-2">
               <StatusBadge status={lead.status} />
@@ -275,7 +268,6 @@ export default function LeadsPage() {
                 <th className="p-3 text-left"><SortHeader label="Status" sKey="status" /></th>
                 <th className="p-3 text-left"><SortHeader label="Name" sKey="name" /></th>
                 <th className="p-3 text-left"><SortHeader label="Unternehmen" sKey="unternehmen" /></th>
-                <th className="p-3 text-left"><SortHeader label="Potenzial" sKey="rechner_ergebnis" /></th>
                 <th className="p-3 text-left"><SortHeader label="Quelle" sKey="quelle" /></th>
                 <th className="p-3 text-left"><SortHeader label="Erstellt" sKey="created_at" /></th>
               </tr>
@@ -315,9 +307,6 @@ export default function LeadsPage() {
                   <td className="p-3 text-muted-foreground">
                     {lead.unternehmen || '–'}
                   </td>
-                  <td className="p-3">
-                    <span className="font-bold text-primary num">{formatCurrency(lead.rechner_ergebnis)}</span>
-                  </td>
                   <td className="p-3 text-muted-foreground text-xs">
                     {lead.quelle || '–'}
                   </td>
@@ -328,7 +317,7 @@ export default function LeadsPage() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-muted-foreground">
+                  <td colSpan={5} className="p-12 text-center text-muted-foreground">
                     {hasActiveFilter ? 'Keine Leads gefunden' : 'Noch keine Leads'}
                   </td>
                 </tr>
