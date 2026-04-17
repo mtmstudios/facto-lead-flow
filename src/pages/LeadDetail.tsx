@@ -249,7 +249,7 @@ export default function LeadDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0.5 md:gap-1 border-b border-border/50 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+        <div className="flex justify-center md:justify-start gap-0.5 md:gap-1 border-b border-border/50 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
           {tabs.map(tab => (
             <button
               key={tab.key}
