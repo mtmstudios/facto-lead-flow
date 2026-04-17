@@ -238,10 +238,8 @@ export default function LeadsPage() {
           >
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold truncate">{lead.vorname} {lead.nachname}</p>
-                {lead.unternehmen && (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{lead.unternehmen}</p>
-                )}
+                <p className="text-sm font-semibold truncate">{lead.unternehmen || '–'}</p>
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{lead.vorname} {lead.nachname}</p>
               </div>
               <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
             </div>
@@ -266,8 +264,7 @@ export default function LeadsPage() {
             <thead>
               <tr>
                 <th className="p-3 text-left"><SortHeader label="Status" sKey="status" /></th>
-                <th className="p-3 text-left"><SortHeader label="Name" sKey="name" /></th>
-                <th className="p-3 text-left"><SortHeader label="Unternehmen" sKey="unternehmen" /></th>
+                <th className="p-3 text-left"><SortHeader label="Firma / Name" sKey="unternehmen" /></th>
                 <th className="p-3 text-left"><SortHeader label="Quelle" sKey="quelle" /></th>
                 <th className="p-3 text-left"><SortHeader label="Erstellt" sKey="created_at" /></th>
               </tr>
@@ -296,16 +293,14 @@ export default function LeadsPage() {
                   </td>
                   <td className="p-3">
                     <div>
-                      <p className="font-medium">{lead.vorname} {lead.nachname}</p>
+                      <p className="font-semibold">{lead.unternehmen || '–'}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{lead.vorname} {lead.nachname}</p>
                       {isOverdue(lead) && (
                         <span className="text-xs text-destructive font-medium flex items-center gap-1 mt-0.5">
                           <AlertTriangle className="h-3 w-3" /> Überfällig
                         </span>
                       )}
                     </div>
-                  </td>
-                  <td className="p-3 text-muted-foreground">
-                    {lead.unternehmen || '–'}
                   </td>
                   <td className="p-3 text-muted-foreground text-xs">
                     {lead.quelle || '–'}
@@ -317,7 +312,7 @@ export default function LeadsPage() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-12 text-center text-muted-foreground">
+                  <td colSpan={4} className="p-12 text-center text-muted-foreground">
                     {hasActiveFilter ? 'Keine Leads gefunden' : 'Noch keine Leads'}
                   </td>
                 </tr>

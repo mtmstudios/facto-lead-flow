@@ -186,10 +186,10 @@ export default function DashboardPage() {
                   className="flex items-center justify-between w-full px-5 py-3.5 hover:bg-primary/[0.02] transition-all text-left group"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium group-hover:text-primary transition-colors">
-                      {lead.vorname} {lead.nachname}
+                    <p className="text-sm font-semibold group-hover:text-primary transition-colors truncate">
+                      {lead.unternehmen || '–'}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">{lead.unternehmen || '–'}</p>
+                    <p className="text-xs text-muted-foreground truncate">{lead.vorname} {lead.nachname}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
                     <StatusBadge status={lead.status} />
