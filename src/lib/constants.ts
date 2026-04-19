@@ -11,6 +11,15 @@ export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 
 export const ENTWICKLUNGSAUFWAND_OPTIONS = ['unter 100.000 EUR', '100.000 – 400.000 EUR', '400.000 – 1.000.000 EUR', 'über 1.000.000 EUR'] as const;
 export const MA_ENTWICKLUNG_OPTIONS = ['1', '2–5', '6–10', 'mehr als 10'] as const;
 
+// Pipeline stages — 5 steps shown as progress bar in LeadDetail
+export const PIPELINE_STAGES = [
+  { key: 'Neu',         label: 'Neu',          status: 'Neu',                    color: '#3B82F6', statuses: ['Neu', 'Mail gesendet'] },
+  { key: 'Kontaktiert', label: 'Kontaktiert',   status: 'Kontaktiert',            color: '#F59E0B', statuses: ['Kontaktiert'] },
+  { key: 'Gespräch',    label: 'Gespräch',      status: 'Erstgespräch geplant',   color: '#F97316', statuses: ['Erstgespräch geplant', 'Erstgespräch durchgeführt'] },
+  { key: 'Qualifiziert',label: 'Qualifiziert',  status: 'Qualifiziert',           color: '#8B5CF6', statuses: ['Fragenkatalog gesendet', 'Fragenkatalog beantwortet', 'Qualifiziert'] },
+  { key: 'Mandat',      label: 'Mandat',        status: 'Mandat',                 color: '#22C55E', statuses: ['Mandat'] },
+] as const;
+
 // Simplified status list for dropdowns (matches 5 pipeline columns + negative outcomes)
 export const DROPDOWN_STATUSES = [
   'Neu', 'Kontaktiert', 'Erstgespräch geplant', 'Qualifiziert', 'Mandat',

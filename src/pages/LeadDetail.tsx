@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { DROPDOWN_STATUSES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
+import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
@@ -247,6 +247,53 @@ export default function LeadDetail() {
             </div>
           </div>
         </div>
+
+        {/* Pipeline Stepper */}
+        {!['Kalt', 'Disqualifiziert', 'Nicht förderfähig'].includes(lead.status) && (() => {
+          const activeIdx = PIPELINE_STAGES.findIndex(s => s.statuses.includes(lead.status as never));
+          return (
+            <div className="bg-muted/40 rounded-xl p-3 md:p-4 border border-border/50">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">Pipeline-Stufe</p>
+              <div className="flex items-center gap-0 relative">
+                {PIPELINE_STAGES.map((stage, idx) => {
+                  const isDone = idx < activeIdx;
+                  const isActive = idx === activeIdx;
+                  return (
+                    <div key={stage.key} className="flex items-center flex-1 min-w-0">
+                      <button
+                        onClick={() => handleStatusChange(stage.status)}
+                        className="flex flex-col items-center gap-1 flex-1 min-w-0 group"
+                      >
+                        <div
+                          className={`h-7 w-7 md:h-8 md:w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 shrink-0 ${
+                            isActive
+                              ? 'ring-2 ring-offset-2 ring-offset-background text-white scale-110'
+                              : isDone
+                              ? 'text-white'
+                              : 'bg-muted text-muted-foreground group-hover:bg-accent'
+                          }`}
+                          style={isActive || isDone ? { backgroundColor: stage.color, ringColor: stage.color } : {}}
+                        >
+                          {isDone ? '✓' : idx + 1}
+                        </div>
+                        <span className={`text-[10px] md:text-xs font-medium text-center truncate w-full px-0.5 transition-colors ${
+                          isActive ? 'text-foreground font-semibold' : isDone ? 'text-foreground/70' : 'text-muted-foreground'
+                        }`}>
+                          {stage.label}
+                        </span>
+                      </button>
+                      {idx < PIPELINE_STAGES.length - 1 && (
+                        <div className={`h-[2px] flex-1 mx-1 rounded-full transition-all duration-300 ${
+                          idx < activeIdx ? 'bg-primary/60' : 'bg-border'
+                        }`} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Tabs */}
         <div className="flex justify-center md:justify-start gap-0.5 md:gap-1 border-b border-border/50 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
