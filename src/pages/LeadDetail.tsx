@@ -272,7 +272,7 @@ export default function LeadDetail() {
                               ? 'text-white'
                               : 'bg-muted text-muted-foreground group-hover:bg-accent'
                           }`}
-                          style={isActive || isDone ? { backgroundColor: stage.color, ringColor: stage.color } : {}}
+                          style={isActive || isDone ? { backgroundColor: stage.color, '--tw-ring-color': stage.color } as React.CSSProperties : {}}
                         >
                           {isDone ? '✓' : idx + 1}
                         </div>
