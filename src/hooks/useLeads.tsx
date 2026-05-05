@@ -82,22 +82,37 @@ export function useCreateLead() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
-      toast.success("Lead erstellt");
-    },
-    onError: (err: Error) => toast.error(err.message),
-  });
-}
+      export function useUpdateLead() {
+        const queryClient = useQueryClient();
+        return useMutation({
+          mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
+            console.log("[UPDATE] Lead:", id, "Updates:", updates);
 
-export function useUpdateLead() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
-      const { error } = await supabase.from("leads").update(updates).eq("id", id);
-      if (error) throw error;
-      return { id, ...updates } as Lead;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
+            const { data: sessionData } = await supabase.auth.getSession();
+            console.log("[UPDATE] User:", sessionData?.session?.user?.email ?? "NICHT EINGELOGGT!");
+            console.log("[UPDATE] JWT vorhanden:", !!sessionData?.session?.access_token);
+
+            const result = await supabase.from("leads").update(updates).eq("id", id);
+            console.log("[UPDATE] Supabase Response:", result);
+
+            if (result.error) {
+              console.error("[UPDATE] FEHLER:", result.error);
+              throw new Error(result.error.message);
+            }
+
+            return { id, ...updates } as Lead;
+          },
+          onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ["leads"] });
+            queryClient.invalidateQueries({ queryKey: ["leads", data.id] });
+            toast.success("Lead aktualisiert");
+          },
+          onError: (err: Error) => {
+            console.error("[UPDATE] onError:", err);
+            toast.error(err.message);
+          },
+        });
+      }
       queryClient.invalidateQueries({ queryKey: ["leads", data.id] });
       toast.success("Lead aktualisiert");
     },
