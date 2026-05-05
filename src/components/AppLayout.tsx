@@ -1,5 +1,6 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LayoutDashboard, Users, Kanban, LogOut } from 'lucide-react';
 import { useEffect } from 'react';
@@ -14,9 +15,21 @@ const navItems = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
