@@ -104,9 +104,7 @@ export default function LeadDetail() {
   }
 
   const handleStatusChange = (status: string) => {
-    const oldStatus = lead.status;
     updateLead.mutate({ id: lead.id, status });
-    createAktivitaet.mutate({ lead_id: lead.id, typ: 'Statusänderung', beschreibung: `Status geändert: ${oldStatus} → ${status}`, erstellt_von: user?.email || 'System' });
   };
 
   const handleSaveAktivitaet = () => {
