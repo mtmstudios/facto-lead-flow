@@ -9,21 +9,31 @@ import logoImg from '@/assets/logo.png';
 import mtmLogoImg from '@/assets/mtm-logo.png';
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+
+  if (user) {
+    window.location.replace('/');
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = mode === 'signin'
+      ? await signIn(email, password)
+      : await signUp(email, password);
     setLoading(false);
     if (error) {
       toast.error(error.message === 'Invalid login credentials'
         ? 'Ungültige Anmeldedaten'
         : error.message
       );
+    } else if (mode === 'signup') {
+      toast.success('Konto erstellt – Sie sind angemeldet.');
     }
   };
 
@@ -135,11 +145,18 @@ export default function LoginPage() {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  Anmelden
+                  {mode === 'signin' ? 'Anmelden' : 'Registrieren'}
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                 </>
               )}
             </Button>
+            <button
+              type="button"
+              onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+              className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {mode === 'signin' ? 'Noch kein Konto? Registrieren' : 'Bereits registriert? Anmelden'}
+            </button>
           </form>
 
           {/* Footer — Agency branding */}
