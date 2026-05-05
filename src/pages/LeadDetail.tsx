@@ -198,7 +198,7 @@ export default function LeadDetail() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 md:gap-2 mt-2 flex-wrap">
+                <div className="flex items-center justify-center md:justify-start gap-1.5 md:gap-2 mt-2 flex-wrap">
                   <DropdownMenu>
                     <DropdownMenuTrigger><StatusBadge status={lead.status} className="cursor-pointer" /></DropdownMenuTrigger>
                     <DropdownMenuContent>{DROPDOWN_STATUSES.map(s => <DropdownMenuItem key={s} onClick={() => handleStatusChange(s)}>{s}</DropdownMenuItem>)}</DropdownMenuContent>
@@ -272,7 +272,7 @@ export default function LeadDetail() {
                               ? 'text-white'
                               : 'bg-muted text-muted-foreground group-hover:bg-accent'
                           }`}
-                          style={isActive || isDone ? { backgroundColor: stage.color, ringColor: stage.color } : {}}
+                          style={isActive || isDone ? { backgroundColor: stage.color, '--tw-ring-color': stage.color } as React.CSSProperties : {}}
                         >
                           {isDone ? '✓' : idx + 1}
                         </div>
