@@ -86,10 +86,9 @@ export function useUpdateLead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
-      const { data, error } = await supabase.from('leads').update(updates).eq('id', id).select();
+      const { error } = await supabase.from('leads').update(updates).eq('id', id);
       if (error) throw error;
-      if (!data || data.length === 0) throw new Error('Lead nicht gefunden oder keine Berechtigung');
-      return data[0];
+      return { id, ...updates } as Lead;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['leads'] });
