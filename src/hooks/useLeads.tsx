@@ -82,41 +82,40 @@ export function useCreateLead() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
-      export function useUpdateLead() {
-        const queryClient = useQueryClient();
-        return useMutation({
-          mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
-            console.log("[UPDATE] Lead:", id, "Updates:", updates);
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
 
-            const { data: sessionData } = await supabase.auth.getSession();
-            console.log("[UPDATE] User:", sessionData?.session?.user?.email ?? "NICHT EINGELOGGT!");
-            console.log("[UPDATE] JWT vorhanden:", !!sessionData?.session?.access_token);
+export function useUpdateLead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
+      console.log("[UPDATE] Lead:", id, "Updates:", updates);
 
-            const result = await supabase.from("leads").update(updates).eq("id", id);
-            console.log("[UPDATE] Supabase Response:", result);
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log("[UPDATE] User:", sessionData?.session?.user?.email ?? "NICHT EINGELOGGT!");
+      console.log("[UPDATE] JWT vorhanden:", !!sessionData?.session?.access_token);
 
-            if (result.error) {
-              console.error("[UPDATE] FEHLER:", result.error);
-              throw new Error(result.error.message);
-            }
+      const result = await supabase.from("leads").update(updates).eq("id", id);
+      console.log("[UPDATE] Supabase Response:", result);
 
-            return { id, ...updates } as Lead;
-          },
-          onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ["leads"] });
-            queryClient.invalidateQueries({ queryKey: ["leads", data.id] });
-            toast.success("Lead aktualisiert");
-          },
-          onError: (err: Error) => {
-            console.error("[UPDATE] onError:", err);
-            toast.error(err.message);
-          },
-        });
+      if (result.error) {
+        console.error("[UPDATE] FEHLER:", result.error);
+        throw new Error(result.error.message);
       }
+
+      return { id, ...updates } as Lead;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
       queryClient.invalidateQueries({ queryKey: ["leads", data.id] });
       toast.success("Lead aktualisiert");
     },
-    onError: (err: Error) => toast.error(err.message),
+    onError: (err: Error) => {
+      console.error("[UPDATE] onError:", err);
+      toast.error(err.message);
+    },
   });
 }
 export function useDeleteLead() {
