@@ -250,9 +250,18 @@ export default function LeadDetail() {
         {/* Pipeline Stepper */}
         {!['Kalt', 'Disqualifiziert', 'Nicht förderfähig'].includes(lead.status) && (() => {
           const activeIdx = PIPELINE_STAGES.findIndex(s => s.statuses.includes(lead.status as never));
+          const activeStage = PIPELINE_STAGES[activeIdx];
           return (
             <div className="bg-muted/40 rounded-xl p-3 md:p-4 border border-border/50">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">Pipeline-Stufe</p>
+              {/* Mobile: kompakte Anzeige */}
+              <div className="flex items-center justify-between mb-3 md:hidden">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Pipeline-Stufe</p>
+                <span className="text-xs font-semibold" style={{ color: activeStage?.color }}>
+                  {activeIdx + 1}/{PIPELINE_STAGES.length} · {activeStage?.label}
+                </span>
+              </div>
+              {/* Desktop: Label oben */}
+              <p className="hidden md:block text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">Pipeline-Stufe</p>
               <div className="flex items-center gap-0 relative">
                 {PIPELINE_STAGES.map((stage, idx) => {
                   const isDone = idx < activeIdx;
@@ -265,17 +274,16 @@ export default function LeadDetail() {
                       >
                         <div
                           className={`h-7 w-7 md:h-8 md:w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200 shrink-0 ${
-                            isActive
-                              ? 'ring-2 ring-offset-2 ring-offset-background text-white scale-110'
-                              : isDone
-                              ? 'text-white'
+                            isActive ? 'ring-2 ring-offset-2 ring-offset-background text-white scale-110'
+                              : isDone ? 'text-white'
                               : 'bg-muted text-muted-foreground group-hover:bg-accent'
                           }`}
                           style={isActive || isDone ? { backgroundColor: stage.color, '--tw-ring-color': stage.color } as React.CSSProperties : {}}
                         >
                           {isDone ? '✓' : idx + 1}
                         </div>
-                        <span className={`text-[10px] md:text-xs font-medium text-center truncate w-full px-0.5 transition-colors ${
+                        {/* Label nur auf Desktop */}
+                        <span className={`hidden md:block text-xs font-medium text-center truncate w-full px-0.5 transition-colors ${
                           isActive ? 'text-foreground font-semibold' : isDone ? 'text-foreground/70' : 'text-muted-foreground'
                         }`}>
                           {stage.label}
@@ -324,65 +332,81 @@ export default function LeadDetail() {
 
       {/* Tab: Übersicht */}
       {activeTab === 'uebersicht' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-          {/* Kontakt + Qualifizierung in einer Card */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+
+          {/* Mobile: Schnell-Aktionen */}
+          {(lead.telefon || lead.email) && (
+            <div className="flex gap-2 md:hidden">
+              {lead.telefon && (
+                <a href={`tel:${lead.telefon}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary/8 border border-primary/15 text-primary text-sm font-semibold active:scale-95 transition-transform">
+                  <Phone className="h-4 w-4" /> Anrufen
+                </a>
+              )}
+              {lead.email && (
+                <a href={`mailto:${lead.email}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-muted/60 border border-border/50 text-foreground text-sm font-semibold active:scale-95 transition-transform">
+                  <Mail className="h-4 w-4" /> E-Mail
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Kontaktdaten */}
           <Card className="glass-card">
-            <CardContent className="p-5 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Kontaktdaten */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-bold mb-3">Kontaktdaten</h3>
+            <CardContent className="p-4 md:p-6">
+              <h3 className="text-sm font-bold mb-3">Kontaktdaten</h3>
+              {/* Mobile: 2-spaltige Chip-Ansicht für Key-Infos */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-0.5">
+                <div className="space-y-0.5">
                   <InlineField label="Vorname" field="vorname" value={lead.vorname} />
                   <InlineField label="Nachname" field="nachname" value={lead.nachname} />
-                  <InlineField label="E-Mail" field="email" value={lead.email} type="email" />
-                  <InlineField label="Telefon" field="telefon" value={lead.telefon} />
                   <InlineField label="Unternehmen" field="unternehmen" value={lead.unternehmen} />
                   <InlineField label="Position" field="position_titel" value={lead.position_titel} />
+                </div>
+                <div className="space-y-0.5 md:mt-0 mt-3 pt-3 md:pt-0 border-t md:border-0 border-border/30">
+                  <InlineField label="E-Mail" field="email" value={lead.email} type="email" />
+                  <InlineField label="Telefon" field="telefon" value={lead.telefon} />
                   <InlineField label="Adresse" field="adresse" value={lead.adresse} />
                   <InlineField label="PLZ / Ort" field="plz" value={lead.plz && lead.ort ? `${lead.plz} ${lead.ort}` : lead.plz || lead.ort} />
                   <InlineField label="Homepage" field="homepage" value={lead.homepage} />
                 </div>
-                {/* Qualifizierung + Vertrieb */}
-                <div className="space-y-2">
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Qualifizierung + Vertrieb */}
+          <Card className="glass-card">
+            <CardContent className="p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-0">
+                <div>
                   <h3 className="text-sm font-bold mb-3">Qualifizierung</h3>
-                  <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Mitarbeiter</span>
-                    <span className="text-sm">{lead.mitarbeiter || '–'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Entwicklung</span>
-                    <span className="text-sm">{lead.entwicklung || '–'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Branche</span>
-                    <span className="text-sm">{lead.branche || '–'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Quelle</span>
-                    <span className="text-sm">{lead.quelle || '–'}</span>
-                  </div>
-                  <div className="flex items-center gap-2 py-0.5">
-                    <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">Erstellt</span>
-                    <span className="text-sm text-muted-foreground">{formatDateTime(lead.created_at)}</span>
-                  </div>
+                  {[
+                    { label: 'Mitarbeiter', value: lead.mitarbeiter },
+                    { label: 'Entwicklung', value: lead.entwicklung },
+                    { label: 'Branche', value: lead.branche },
+                    { label: 'Quelle', value: lead.quelle },
+                    { label: 'Erstellt', value: formatDateTime(lead.created_at) },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-center gap-2 py-1.5 border-b border-border/20 last:border-0">
+                      <span className="text-xs text-muted-foreground w-24 shrink-0">{label}</span>
+                      <span className="text-sm truncate">{value || '–'}</span>
+                    </div>
+                  ))}
                   {lead.rechner_ergebnis != null && lead.rechner_ergebnis > 0 && (
-                    <div className="pt-3 mt-3 border-t border-border/30">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs md:text-sm text-muted-foreground">Rechner-Schätzung</span>
-                          <p className="text-[10px] text-muted-foreground/40 mt-0.5">Indikativ, kein verbindlicher Wert</p>
-                        </div>
-                        <span className="text-base font-semibold text-muted-foreground num">{formatCurrency(lead.rechner_ergebnis)}</span>
+                    <div className="mt-3 pt-3 border-t border-border/30 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs text-muted-foreground">Rechner-Schätzung</span>
+                        <p className="text-[10px] text-muted-foreground/40">Indikativ</p>
                       </div>
+                      <span className="text-sm font-semibold text-muted-foreground num">{formatCurrency(lead.rechner_ergebnis)}</span>
                     </div>
                   )}
-                  <div className="pt-2">
-                    <h3 className="text-sm font-bold mb-2 mt-3">Vertrieb</h3>
-                    <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />
-                    <InlineField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
-                    <InlineField label="Termin" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
-                    <InlineField label="Mandatswert" field="mandats_wert" value={lead.mandats_wert} type="number" />
-                  </div>
+                </div>
+                <div className="mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-border/30">
+                  <h3 className="text-sm font-bold mb-3">Vertrieb</h3>
+                  <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />
+                  <InlineField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                  <InlineField label="Termin" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                  <InlineField label="Mandatswert" field="mandats_wert" value={lead.mandats_wert} type="number" />
                 </div>
               </div>
             </CardContent>
@@ -390,7 +414,7 @@ export default function LeadDetail() {
 
           {/* Notizen */}
           <Card className="glass-card">
-            <CardContent className="p-5 md:p-6">
+            <CardContent className="p-4 md:p-6">
               <h3 className="text-sm font-bold mb-3">Notizen</h3>
               <Textarea
                 placeholder="Freitext-Notizen..."
