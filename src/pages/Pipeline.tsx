@@ -17,7 +17,7 @@ import {
   useDraggable,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { Building2, AlertTriangle } from 'lucide-react';
+import { Building2, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 /* ── 5 vereinfachte Pipeline-Stufen ── */
 const PIPELINE_COLUMNS = [
@@ -37,7 +37,11 @@ const DROP_STATUS: Record<string, string> = {
   'Mandat': 'Mandat',
 };
 
-function DraggableLeadCard({ lead }: { lead: Lead }) {
+function DraggableLeadCard({ lead, columnIndex, onMove }: {
+  lead: Lead;
+  columnIndex: number;
+  onMove: (leadId: string, direction: 'prev' | 'next') => void;
+}) {
   const navigate = useNavigate();
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
   const daysSince = Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000);
@@ -51,26 +55,47 @@ function DraggableLeadCard({ lead }: { lead: Lead }) {
 
   return (
     <div ref={setNodeRef} style={style}>
-      <div
-        className={`lead-card p-3 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}
-        {...listeners}
-        {...attributes}
-      >
-        <div className="flex items-start justify-between gap-2" onClick={() => navigate(`/leads/${lead.id}`)}>
-          <div className="min-w-0 cursor-pointer flex-1">
+      <div className={`lead-card p-3 ${isDragging ? 'dragging' : ''} ${isOverdue ? 'border-destructive/30' : ''}`}>
+        {/* Karteninhalt — klickbar zum Lead */}
+        <div
+          className="flex items-start justify-between gap-2 cursor-pointer"
+          onClick={() => navigate(`/leads/${lead.id}`)}
+          {...listeners}
+          {...attributes}
+        >
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold truncate hover:text-primary transition-colors">
-              {lead.vorname} {lead.nachname}
+              {lead.unternehmen || `${lead.vorname} ${lead.nachname}`}
             </p>
             {lead.unternehmen && (
               <p className="text-xs text-muted-foreground truncate flex items-center gap-1 mt-0.5">
                 <Building2 className="h-3 w-3 shrink-0" />
-                {lead.unternehmen}
+                {lead.vorname} {lead.nachname}
               </p>
             )}
           </div>
           {isOverdue && <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0 mt-0.5" />}
         </div>
 
+        {/* Mobile Pfeil-Buttons — nur auf Mobilgeräten */}
+        <div className="md:hidden flex items-center justify-between mt-2.5 pt-2 border-t border-border/30">
+          <button
+            disabled={columnIndex === 0}
+            onClick={(e) => { e.stopPropagation(); onMove(lead.id, 'prev'); }}
+            className="flex items-center gap-1 text-xs text-muted-foreground disabled:opacity-30 hover:text-primary active:scale-95 transition-all px-2 py-1 rounded-md hover:bg-primary/5"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+            {columnIndex > 0 ? PIPELINE_COLUMNS[columnIndex - 1].label : ''}
+          </button>
+          <button
+            disabled={columnIndex === PIPELINE_COLUMNS.length - 1}
+            onClick={(e) => { e.stopPropagation(); onMove(lead.id, 'next'); }}
+            className="flex items-center gap-1 text-xs text-muted-foreground disabled:opacity-30 hover:text-primary active:scale-95 transition-all px-2 py-1 rounded-md hover:bg-primary/5"
+          >
+            {columnIndex < PIPELINE_COLUMNS.length - 1 ? PIPELINE_COLUMNS[columnIndex + 1].label : ''}
+            <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -87,8 +112,8 @@ function LeadCardOverlay({ lead }: { lead: Lead }) {
   );
 }
 
-function DroppableColumn({ columnKey, label, color, leads: columnLeads }: {
-  columnKey: string; label: string; color: string; leads: Lead[];
+function DroppableColumn({ columnKey, label, color, leads: columnLeads, columnIndex, onMove }: {
+  columnKey: string; label: string; color: string; leads: Lead[]; columnIndex: number; onMove: (leadId: string, direction: 'prev' | 'next') => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: columnKey });
 
@@ -122,7 +147,7 @@ function DroppableColumn({ columnKey, label, color, leads: columnLeads }: {
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.15 }}
             >
-              <DraggableLeadCard lead={lead} />
+              <DraggableLeadCard lead={lead} columnIndex={columnIndex} onMove={onMove} />
             </motion.div>
           ))}
         </AnimatePresence>
@@ -144,6 +169,16 @@ export default function PipelinePage() {
   const { data: leads = [], isLoading } = useLeads();
   const updateLead = useUpdateLead();
   const [activeId, setActiveId] = useState<string | null>(null);
+
+  const handleMove = (leadId: string, direction: 'prev' | 'next') => {
+    const lead = leads.find(l => l.id === leadId);
+    if (!lead) return;
+    const currentColIdx = PIPELINE_COLUMNS.findIndex(c => c.statuses.includes(lead.status));
+    const targetIdx = direction === 'next' ? currentColIdx + 1 : currentColIdx - 1;
+    if (targetIdx < 0 || targetIdx >= PIPELINE_COLUMNS.length) return;
+    const targetStatus = DROP_STATUS[PIPELINE_COLUMNS[targetIdx].key];
+    updateLead.mutate({ id: leadId, status: targetStatus });
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -200,7 +235,7 @@ export default function PipelinePage() {
           <h1 className="text-xl md:text-2xl font-black tracking-tight">Pipeline</h1>
           <p className="text-xs text-muted-foreground mt-1">
             <span className="hidden md:inline">Drag & Drop zum Verschieben</span>
-            <span className="md:hidden">Halten & Ziehen</span>
+            <span className="md:hidden">Pfeile zum Verschieben</span>
           </p>
         </div>
       </motion.div>
@@ -216,13 +251,15 @@ export default function PipelinePage() {
           className="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none scrollbar-hide"
           style={{ minHeight: 'calc(100vh - 220px)' }}
         >
-          {columns.map(col => (
+          {columns.map((col, idx) => (
             <DroppableColumn
               key={col.key}
               columnKey={col.key}
               label={col.label}
               color={col.color}
               leads={col.leads}
+              columnIndex={idx}
+              onMove={handleMove}
             />
           ))}
         </div>
