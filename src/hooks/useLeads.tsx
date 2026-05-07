@@ -15,7 +15,7 @@ export function useLeads() {
   const query = useQuery({
     queryKey: ["leads"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("leads").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("leads").select("*").is("deleted_at", null).order("created_at", { ascending: false });
       if (error) throw error;
       return data as Lead[];
     },
@@ -91,34 +91,62 @@ export function useUpdateLead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: LeadUpdate & { id: string }) => {
-      console.log("[UPDATE] Lead:", id, "Updates:", updates);
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      console.log("[UPDATE] User:", sessionData?.session?.user?.email ?? "NICHT EINGELOGGT!");
-      console.log("[UPDATE] JWT vorhanden:", !!sessionData?.session?.access_token);
-
       const result = await supabase.from("leads").update(updates).eq("id", id);
-      console.log("[UPDATE] Supabase Response:", result);
-
-      if (result.error) {
-        console.error("[UPDATE] FEHLER:", result.error);
-        throw new Error(result.error.message);
-      }
-
+      if (result.error) throw new Error(result.error.message);
       return { id, ...updates } as Lead;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
       queryClient.invalidateQueries({ queryKey: ["leads", data.id] });
-      toast.success("Lead aktualisiert");
     },
-    onError: (err: Error) => {
-      console.error("[UPDATE] onError:", err);
-      toast.error(err.message);
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
+
+export function useDeleteLead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("leads").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["leads-deleted"] });
+      toast.success("Lead in Papierkorb verschoben");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
+
+export function useDeletedLeads() {
+  return useQuery({
+    queryKey: ["leads-deleted"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("leads").select("*").not("deleted_at", "is", null).order("deleted_at", { ascending: false });
+      if (error) throw error;
+      return data as Lead[];
     },
   });
 }
-export function useDeleteLead() {
+
+export function useRestoreLead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("leads").update({ deleted_at: null }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["leads-deleted"] });
+      toast.success("Lead wiederhergestellt");
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
+
+export function usePermanentDeleteLead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -126,8 +154,8 @@ export function useDeleteLead() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["leads"] });
-      toast.success("Lead gelöscht");
+      queryClient.invalidateQueries({ queryKey: ["leads-deleted"] });
+      toast.success("Lead endgültig gelöscht");
     },
     onError: (err: Error) => toast.error(err.message),
   });

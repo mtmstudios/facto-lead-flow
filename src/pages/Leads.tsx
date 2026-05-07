@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useLeads, useCreateLead, useUpdateLead, type Lead } from '@/hooks/useLeads';
+import { useLeads, useCreateLead, useUpdateLead, useDeletedLeads, useRestoreLead, usePermanentDeleteLead, type Lead } from '@/hooks/useLeads';
 import { StatusBadge, PrioBadge } from '@/components/Badges';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
-import { Plus, Download, X, ChevronUp, ChevronDown, Search, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Plus, Download, X, ChevronUp, ChevronDown, Search, ChevronRight, AlertTriangle, Trash2, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -80,9 +80,13 @@ type SortKey = 'status' | 'name' | 'unternehmen' | 'quelle' | 'created_at';
 
 export default function LeadsPage() {
   const { data: leads = [], isLoading } = useLeads();
+  const { data: deletedLeads = [] } = useDeletedLeads();
   const updateLead = useUpdateLead();
+  const restoreLead = useRestoreLead();
+  const permanentDelete = usePermanentDeleteLead();
   const navigate = useNavigate();
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [papierkorb, setPapierkorb] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
@@ -190,11 +194,48 @@ export default function LeadsPage() {
           <Button variant="outline" size="sm" onClick={exportCSV} className="h-9 text-xs">
             <Download className="h-3.5 w-3.5 mr-1.5" /><span className="hidden md:inline">Export</span>
           </Button>
+          <Button variant="outline" size="sm" onClick={() => setPapierkorb(true)} className="h-9 text-xs relative">
+            <Trash2 className="h-3.5 w-3.5 mr-1.5" /><span className="hidden md:inline">Papierkorb</span>
+            {deletedLeads.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 h-4 w-4 rounded-full bg-destructive text-white text-[10px] flex items-center justify-center font-bold">{deletedLeads.length}</span>
+            )}
+          </Button>
           <Button size="sm" onClick={() => setNewLeadOpen(true)} className="h-9 text-xs">
             <Plus className="h-3.5 w-3.5 mr-1.5" /><span className="hidden sm:inline">Neuer Lead</span>
           </Button>
         </div>
       </div>
+
+      {/* Papierkorb Dialog */}
+      <Dialog open={papierkorb} onOpenChange={setPapierkorb}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Trash2 className="h-4 w-4" /> Papierkorb ({deletedLeads.length})</DialogTitle>
+          </DialogHeader>
+          {deletedLeads.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8 text-sm">Papierkorb ist leer</p>
+          ) : (
+            <div className="divide-y divide-border/50">
+              {deletedLeads.map(lead => (
+                <div key={lead.id} className="flex items-center justify-between py-3 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">{lead.unternehmen || '–'}</p>
+                    <p className="text-xs text-muted-foreground">{lead.vorname} {lead.nachname} · gelöscht {new Date(lead.deleted_at!).toLocaleDateString('de-DE')}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => restoreLead.mutate(lead.id)}>
+                      <RotateCcw className="h-3 w-3 mr-1" /> Wiederherstellen
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => permanentDelete.mutate(lead.id)}>
+                      <X className="h-3 w-3 mr-1" /> Endgültig
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Search + Filter — eine Zeile */}
       <div className="flex items-center gap-3">

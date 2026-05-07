@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l src/components/ui/*.tsx)",
+      "Bash(npm install:*)",
+      "Read(//Users/mich/Library/pnpm/**)",
+      "Read(//usr/local/bin/**)",
+      "Read(//Users/mich/.nvm/versions/**)",
+      "Read(//Users/mich/.volta/**)",
+      "Read(//opt/**)",
+      "Bash(mdfind -name node -onlyin /opt)",
+      "Bash(mdfind -name npm -onlyin /usr)",
+      "Bash(mdfind \"kMDItemFSName == ''''node''''\")",
+      "Bash(npx tsc:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\")",
+      "Bash(source ~/.zshrc)",
+      "Bash(ls /opt/homebrew/bin/n*)",
+      "Bash(ls /usr/local/bin/n*)",
+      "Read(//Users/mich/**)",
+      "Bash(find ~/Desktop -iname *mtm*logo* -o -iname *mtm-logo*)",
+      "Bash(find ~/Desktop -path */MTM* -name *.png)",
+      "Bash(curl -vL \"https://www.mtmstudios.de/assets/LOGO-2-WHITE-TARANSPERNT_1766676640443-Ng-FVsmn.png\" -o \"/Users/mich/Library/CloudStorage/GoogleDrive-michael@mtmstudios.de/Geteilte Ablagen/MTM studios /Kunden/Dashboard factonet Holding GmbH/src/assets/mtm-logo.png\")"
+    ]
+  }
+}

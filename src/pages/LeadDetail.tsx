@@ -411,14 +411,26 @@ export default function LeadDetail() {
             <CardContent className="p-5 md:p-6">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-bold">Ersteinschätzung</h3>
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
-                  ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600' :
-                  ff === 'gelb' ? 'bg-amber-500/10 text-amber-600' :
-                  ff === 'rot' ? 'bg-red-500/10 text-red-600' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {ffInfo.label}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+                    ff === 'gruen' ? 'bg-emerald-500/10 text-emerald-600' :
+                    ff === 'gelb' ? 'bg-amber-500/10 text-amber-600' :
+                    ff === 'rot' ? 'bg-red-500/10 text-red-600' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {ffInfo.label}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const fields = { steuerpflichtig_de: null, unternehmen_schwierigkeiten: null, verbundene_unternehmen: null, reine_produktentwicklung: null, wissenschaftliche_risiken: null, auftragnehmer_beteiligt: null, auftragnehmer_aufgabe: null, entwicklung_herausforderungen: null, entwicklungsplan: null, entwicklungsaufwand_4j: null, ma_in_entwicklung: null };
+                      updateLead.mutate({ id: lead.id, ...fields });
+                    }}
+                    className="text-xs text-muted-foreground hover:text-destructive transition-colors flex items-center gap-1"
+                    title="Fragenkatalog zurücksetzen"
+                  >
+                    <RotateCcw className="h-3 w-3" /> Zurücksetzen
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
