@@ -74,6 +74,7 @@ export type Database = {
           auftragnehmer_beteiligt: boolean | null
           branche: string | null
           created_at: string
+          deleted_at: string | null
           email: string | null
           entwicklung: string | null
           entwicklung_herausforderungen: string | null
@@ -123,6 +124,7 @@ export type Database = {
           auftragnehmer_beteiligt?: boolean | null
           branche?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           entwicklung?: string | null
           entwicklung_herausforderungen?: string | null
@@ -172,6 +174,7 @@ export type Database = {
           auftragnehmer_beteiligt?: boolean | null
           branche?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           entwicklung?: string | null
           entwicklung_herausforderungen?: string | null
