@@ -56,7 +56,7 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative z-10 max-w-md space-y-8"
         >
-          <img src={logoImg} alt="factonet" className="h-10 w-auto brightness-0 invert" />
+          <img src={logoImg} alt="factonet" className="h-10 w-auto" />
           <div className="space-y-4">
             <h2 className="text-3xl xl:text-4xl font-black text-white tracking-tight leading-tight">
               Ihr Fördermittel-<br />Dashboard
