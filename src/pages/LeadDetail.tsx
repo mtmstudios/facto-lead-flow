@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLead, useLeadAktivitaeten, useUpdateLead, useDeleteLead, useCreateAktivitaet } from '@/hooks/useLeads';
+import { useLead, useLeadAktivitaeten, useUpdateLead, useDeleteLead, useCreateAktivitaet, useDeleteAktivitaet } from '@/hooks/useLeads';
 import { StatusBadge, PrioBadge } from '@/components/Badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -61,6 +61,7 @@ export default function LeadDetail() {
   const updateLead = useUpdateLead();
   const deleteLead = useDeleteLead();
   const createAktivitaet = useCreateAktivitaet();
+  const deleteAktivitaet = useDeleteAktivitaet();
 
   const [activeTab, setActiveTab] = useState<Tab>('uebersicht');
   const [aktTyp, setAktTyp] = useState('Notiz');
@@ -543,7 +544,7 @@ export default function LeadDetail() {
                 {aktivitaeten.map((akt, i) => {
                   const Icon = ICON_MAP[akt.typ] || FileText;
                   return (
-                    <div key={akt.id} className="flex gap-3 px-5 py-4">
+                    <div key={akt.id} className="flex gap-3 px-5 py-4 group/akt">
                       <div className="h-8 w-8 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 ring-1 ring-primary/10">
                         <Icon className="h-4 w-4 text-primary" />
                       </div>
@@ -555,6 +556,12 @@ export default function LeadDetail() {
                         <p className="text-sm text-muted-foreground mt-0.5">{akt.beschreibung}</p>
                         {akt.erstellt_von && <p className="text-xs text-muted-foreground/60 mt-1">von {akt.erstellt_von}</p>}
                       </div>
+                      <button
+                        onClick={() => deleteAktivitaet.mutate({ id: akt.id, lead_id: akt.lead_id })}
+                        className="opacity-0 group-hover/akt:opacity-100 transition-opacity shrink-0 p-1 rounded hover:bg-destructive/10 hover:text-destructive text-muted-foreground"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   );
                 })}

@@ -161,6 +161,21 @@ export function usePermanentDeleteLead() {
   });
 }
 
+export function useDeleteAktivitaet() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, lead_id }: { id: string; lead_id: string }) => {
+      const { error } = await supabase.from("aktivitaeten").delete().eq("id", id);
+      if (error) throw error;
+      return { lead_id };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["aktivitaeten", data.lead_id] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
+
 export function useCreateAktivitaet() {
   const queryClient = useQueryClient();
   return useMutation({
