@@ -22,6 +22,20 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Shared-Secret Auth für Webhooks (Meta Ads, n8n, etc.)
+    const expectedKey = Deno.env.get("LEAD_INGEST_API_KEY");
+    if (expectedKey) {
+      const provided =
+        req.headers.get("x-api-key") ||
+        req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+      if (provided !== expectedKey) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const body = await req.json();
 
     const { vorname, nachname, email, telefon, unternehmen, mitarbeiter, entwicklung, rechner_ergebnis, branche, quelle, utm_source, utm_medium, utm_campaign, utm_content } = body;
