@@ -26,7 +26,8 @@ function BoolField({ label, field, value, onUpdate }: { label: string; field: st
       <p className="text-sm text-foreground/80 flex-1 leading-relaxed">{label}</p>
       <div className="flex gap-1 shrink-0">
         <button
-          onClick={() => onUpdate(field, true)}
+          onClick={() => onUpdate(field, value === true ? null : true)}
+          title={value === true ? 'Auswahl entfernen' : 'Als Ja markieren'}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === true
               ? 'bg-emerald-500/15 text-emerald-600 ring-1 ring-emerald-500/20'
@@ -37,7 +38,8 @@ function BoolField({ label, field, value, onUpdate }: { label: string; field: st
           Ja
         </button>
         <button
-          onClick={() => onUpdate(field, false)}
+          onClick={() => onUpdate(field, value === false ? null : false)}
+          title={value === false ? 'Auswahl entfernen' : 'Als Nein markieren'}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
             value === false
               ? 'bg-red-500/15 text-red-600 ring-1 ring-red-500/20'
