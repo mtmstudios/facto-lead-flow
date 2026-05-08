@@ -226,6 +226,11 @@ export default function LeadDetail() {
                   <a href={`tel:${lead.telefon}`}><Phone className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
                 </Button>
               )}
+              {lead.email && (
+                <Button variant="outline" size="sm" asChild className="h-8 md:h-9 px-2 md:px-3">
+                  <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
+                </Button>
+              )}
               <Button
                 variant="default"
                 size="sm"
@@ -237,11 +242,6 @@ export default function LeadDetail() {
               >
                 <Save className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Speichern</span>
               </Button>
-              {lead.email && (
-                <Button variant="outline" size="sm" asChild className="h-8 md:h-9 px-2 md:px-3">
-                  <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
-                </Button>
-              )}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" className="h-8 md:h-9 px-2 md:px-3"><Trash2 className="h-4 w-4" /></Button>
