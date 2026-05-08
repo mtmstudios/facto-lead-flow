@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
-import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
@@ -225,6 +226,17 @@ export default function LeadDetail() {
                   <a href={`tel:${lead.telefon}`}><Phone className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Anrufen</span></a>
                 </Button>
               )}
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  (document.activeElement as HTMLElement | null)?.blur?.();
+                  setTimeout(() => toast.success('Alle Änderungen gespeichert'), 50);
+                }}
+                className="h-8 md:h-9 px-2 md:px-3"
+              >
+                <Save className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">Speichern</span>
+              </Button>
               {lead.email && (
                 <Button variant="outline" size="sm" asChild className="h-8 md:h-9 px-2 md:px-3">
                   <a href={`mailto:${lead.email}`}><Mail className="h-4 w-4 md:mr-1.5" /><span className="hidden md:inline">E-Mail</span></a>
