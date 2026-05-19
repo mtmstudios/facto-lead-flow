@@ -45,9 +45,6 @@ jobs:
 
       - name: Deploy Container Stack to Mittwald
         uses: mittwald/deploy-container-action@v1
-        env:
-          GHCR_USERNAME: ${{ github.repository_owner }}
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           api_token: ${{ secrets.MITTWALD_API_TOKEN }}
           stack_id: "a47b82b8-b06b-4483-bbe9-45072b904c4e"
