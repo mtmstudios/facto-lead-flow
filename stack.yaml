@@ -1,3 +1,8 @@
+registries:
+  - host: ghcr.io
+    username: "{{ .Env.GHCR_USERNAME }}"
+    password: "{{ .Env.GHCR_TOKEN }}"
+
 services:
   dashboard:
     description: "factonet Lead Dashboard"
