@@ -1,5 +1,6 @@
 services:
   dashboard:
+    description: "factonet Lead Dashboard"
     image: ghcr.io/mtmstudios/facto-lead-flow:latest
     ports:
       - "80"
