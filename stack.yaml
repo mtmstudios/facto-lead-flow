@@ -1,0 +1,5 @@
+services:
+  dashboard:
+    image: ghcr.io/mtmstudios/facto-lead-flow:latest
+    ports:
+      - "80"
