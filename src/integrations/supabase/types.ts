@@ -82,6 +82,9 @@ export type Database = {
           entwicklungsplan: string | null
           foerderfaehigkeit: string | null
           foerdersumme_genehmigt: number | null
+          fragebogen_beantwortet_am: string | null
+          fragebogen_token: string | null
+          fragebogen_versendet_am: string | null
           homepage: string | null
           id: string
           kontaktiert_am: string | null
@@ -132,6 +135,9 @@ export type Database = {
           entwicklungsplan?: string | null
           foerderfaehigkeit?: string | null
           foerdersumme_genehmigt?: number | null
+          fragebogen_beantwortet_am?: string | null
+          fragebogen_token?: string | null
+          fragebogen_versendet_am?: string | null
           homepage?: string | null
           id?: string
           kontaktiert_am?: string | null
@@ -182,6 +188,9 @@ export type Database = {
           entwicklungsplan?: string | null
           foerderfaehigkeit?: string | null
           foerdersumme_genehmigt?: number | null
+          fragebogen_beantwortet_am?: string | null
+          fragebogen_token?: string | null
+          fragebogen_versendet_am?: string | null
           homepage?: string | null
           id?: string
           kontaktiert_am?: string | null
