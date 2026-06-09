@@ -27,6 +27,7 @@ function NewLeadModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v:
       ...form,
       quelle: 'Manuell',
       prioritaet,
+      zugewiesen_an: DEFAULT_ZUGEWIESEN,
       mitarbeiter: form.mitarbeiter || null,
       entwicklung: form.entwicklung || null,
       branche: form.branche || null,
