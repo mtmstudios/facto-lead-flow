@@ -171,6 +171,10 @@ export default function LeadsPage() {
     updateLead.mutate({ id: leadId, status: newStatus });
   };
 
+  const handleQuickZugewiesenChange = (leadId: string, value: string) => {
+    updateLead.mutate({ id: leadId, zugewiesen_an: value });
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
