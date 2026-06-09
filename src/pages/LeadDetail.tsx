@@ -118,8 +118,15 @@ export default function LeadDetail() {
   };
 
   const handleInlineEdit = (field: string, value: string | number | boolean | null) => {
-    updateLead.mutate({ id: lead.id, [field]: value });
+    let finalValue = value;
+    if (field === 'homepage' && typeof value === 'string') finalValue = normalizeUrl(value);
+    updateLead.mutate({ id: lead.id, [field]: finalValue });
     setEditField(null);
+  };
+
+  const handleDateTimeChange = (field: string, localValue: string) => {
+    const iso = localValue ? new Date(localValue).toISOString() : null;
+    updateLead.mutate({ id: lead.id, [field]: iso });
   };
 
   const handleDelete = () => {
