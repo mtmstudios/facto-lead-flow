@@ -10,6 +10,8 @@ export const ENTWICKLUNG_OPTIONS = ['Ja, regelmäßig', 'Ja, gelegentlich', 'Nei
 export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 'Termin', 'Fragenkatalog'] as const;
 export const ENTWICKLUNGSAUFWAND_OPTIONS = ['unter 100.000 EUR', '100.000 – 400.000 EUR', '400.000 – 1.000.000 EUR', 'über 1.000.000 EUR'] as const;
 export const MA_ENTWICKLUNG_OPTIONS = ['1', '2–5', '6–10', 'mehr als 10'] as const;
+export const ZUGEWIESEN_OPTIONS = ['Constantin Seretoulis', 'Michael Grözinger', 'Nina Bayer'] as const;
+export const DEFAULT_ZUGEWIESEN = 'Constantin Seretoulis';
 
 // Pipeline stages — 5 steps shown as progress bar in LeadDetail
 export const PIPELINE_STAGES = [
@@ -87,6 +89,24 @@ export function formatDateTime(dateStr: string | null): string {
   return new Date(dateStr).toLocaleDateString('de-DE', {
     day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
+}
+
+/** Convert ISO timestamp to value for <input type="datetime-local"> (local timezone, "YYYY-MM-DDTHH:MM"). */
+export function toDatetimeLocalInput(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Normalize a user-entered URL: prepend https:// if missing scheme. Returns null for empty. */
+export function normalizeUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
 }
 
 export function isOverdue(lead: { status: string; created_at: string }): boolean {

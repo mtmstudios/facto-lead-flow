@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, formatCurrency, formatDateTime, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
+import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, ZUGEWIESEN_OPTIONS, formatCurrency, formatDateTime, toDatetimeLocalInput, normalizeUrl, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
@@ -118,8 +118,15 @@ export default function LeadDetail() {
   };
 
   const handleInlineEdit = (field: string, value: string | number | boolean | null) => {
-    updateLead.mutate({ id: lead.id, [field]: value });
+    let finalValue = value;
+    if (field === 'homepage' && typeof value === 'string') finalValue = normalizeUrl(value);
+    updateLead.mutate({ id: lead.id, [field]: finalValue });
     setEditField(null);
+  };
+
+  const handleDateTimeChange = (field: string, localValue: string) => {
+    const iso = localValue ? new Date(localValue).toISOString() : null;
+    updateLead.mutate({ id: lead.id, [field]: iso });
   };
 
   const handleDelete = () => {
@@ -148,18 +155,69 @@ export default function LeadDetail() {
         </div>
       );
     }
+    const isUrl = field === 'homepage' && typeof value === 'string' && value;
     return (
-      <div
-        className="flex items-center gap-2 cursor-pointer group py-0.5"
-        onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
-      >
-        <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
-        <span className="text-sm group-hover:text-primary transition-colors truncate">
-          {value || <span className="text-muted-foreground/40 italic">–</span>}
-        </span>
+      <div className="flex items-center gap-2 group py-0.5">
+        <span
+          className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0 cursor-pointer"
+          onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+        >{label}</span>
+        {isUrl ? (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <a
+              href={value as string}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="text-sm text-primary hover:underline truncate"
+            >
+              {value}
+            </a>
+            <button
+              onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+              className="text-xs text-muted-foreground hover:text-primary"
+            >Bearbeiten</button>
+          </div>
+        ) : (
+          <span
+            className="text-sm group-hover:text-primary transition-colors truncate cursor-pointer flex-1"
+            onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+          >
+            {value || <span className="text-muted-foreground/40 italic">–</span>}
+          </span>
+        )}
       </div>
     );
   };
+
+  const InlineSelectField = ({ label, field, value, options, placeholder }: { label: string; field: string; value: string | null; options: readonly string[]; placeholder?: string }) => (
+    <div className="flex items-center gap-2 py-0.5">
+      <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
+      <Select value={value || ''} onValueChange={v => handleInlineEdit(field, v || null)}>
+        <SelectTrigger className="h-8 text-sm flex-1"><SelectValue placeholder={placeholder || '–'} /></SelectTrigger>
+        <SelectContent>
+          {options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const InlineDateTimeField = ({ label, field, value }: { label: string; field: string; value: string | null }) => (
+    <div className="flex items-center gap-2 py-0.5">
+      <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
+      <Input
+        type="datetime-local"
+        value={toDatetimeLocalInput(value)}
+        onChange={e => handleDateTimeChange(field, e.target.value)}
+        className="h-8 text-sm flex-1"
+      />
+      {value && (
+        <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">
+          {formatDateTime(value)}
+        </span>
+      )}
+    </div>
+  );
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'uebersicht', label: 'Übersicht' },
@@ -417,9 +475,9 @@ export default function LeadDetail() {
                 </div>
                 <div className="mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-border/30">
                   <h3 className="text-sm font-bold mb-3">Vertrieb</h3>
-                  <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />
-                  <InlineField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
-                  <InlineField label="Termin" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                  <InlineSelectField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} options={ZUGEWIESEN_OPTIONS} placeholder="Auswählen..." />
+                  <InlineDateTimeField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am} />
+                  <InlineDateTimeField label="Termin" field="termin_am" value={lead.termin_am} />
                   <InlineField label="Mandatswert" field="mandats_wert" value={lead.mandats_wert} type="number" />
                 </div>
               </div>
