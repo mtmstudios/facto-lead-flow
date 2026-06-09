@@ -134,7 +134,7 @@ export default function LeadDetail() {
     deleteLead.mutate(lead.id, { onSuccess: () => navigate('/leads') });
   };
 
-  const InlineField = ({ label, field, value, type = 'text' }: { label: string; field: string; value: string | number | null; type?: string }) => {
+  const InlineField = ({ label, field, value, type = 'text', placeholder }: { label: string; field: string; value: string | number | null; type?: string; placeholder?: string }) => {
     if (editField === field) {
       return (
         <div className="flex items-center gap-2">
@@ -142,9 +142,11 @@ export default function LeadDetail() {
           <Input
             type={type}
             value={editValue}
+            placeholder={placeholder}
             onChange={e => setEditValue(e.target.value)}
             className="h-8 text-sm flex-1"
             autoFocus
+            onBlur={() => handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null)}
             onKeyDown={e => {
               if (e.key === 'Enter') handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null);
               if (e.key === 'Escape') setEditField(null);
@@ -184,7 +186,7 @@ export default function LeadDetail() {
             className="text-sm group-hover:text-primary transition-colors truncate cursor-pointer flex-1"
             onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
           >
-            {value || <span className="text-muted-foreground/40 italic">–</span>}
+            {value || <span className="text-muted-foreground/40 italic">{placeholder || '–'}</span>}
           </span>
         )}
       </div>
@@ -578,24 +580,8 @@ export default function LeadDetail() {
                       />
                     </div>
                   )}
-                  <div>
-                    <label className="text-sm text-muted-foreground block mb-1.5">Entwicklungsaufwand (4 Jahre)</label>
-                    <Select value={lead.entwicklungsaufwand_4j || ''} onValueChange={v => handleInlineEdit('entwicklungsaufwand_4j', v)}>
-                      <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
-                      <SelectContent>
-                        {ENTWICKLUNGSAUFWAND_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground block mb-1.5">MA in Entwicklung</label>
-                    <Select value={lead.ma_in_entwicklung || ''} onValueChange={v => handleInlineEdit('ma_in_entwicklung', v)}>
-                      <SelectTrigger className="text-sm"><SelectValue placeholder="Bitte wählen..." /></SelectTrigger>
-                      <SelectContent>
-                        {MA_ENTWICKLUNG_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <InlineField label="Entwicklungsaufwand (4 Jahre)" field="entwicklungsaufwand_4j" value={lead.entwicklungsaufwand_4j} placeholder="z. B. 500.000 €" />
+                  <InlineField label="MA in Entwicklung" field="ma_in_entwicklung" value={lead.ma_in_entwicklung} placeholder="z. B. 5" />
                 </div>
               </div>
             </CardContent>
