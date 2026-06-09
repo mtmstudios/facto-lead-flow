@@ -10,6 +10,8 @@ export const ENTWICKLUNG_OPTIONS = ['Ja, regelmäßig', 'Ja, gelegentlich', 'Nei
 export const AKTIVITAET_TYPEN = ['Anruf', 'E-Mail', 'Notiz', 'Statusänderung', 'Termin', 'Fragenkatalog'] as const;
 export const ENTWICKLUNGSAUFWAND_OPTIONS = ['unter 100.000 EUR', '100.000 – 400.000 EUR', '400.000 – 1.000.000 EUR', 'über 1.000.000 EUR'] as const;
 export const MA_ENTWICKLUNG_OPTIONS = ['1', '2–5', '6–10', 'mehr als 10'] as const;
+export const ZUGEWIESEN_OPTIONS = ['Constantin Seretoulis', 'Michael Grözinger', 'Nina Bayer'] as const;
+export const DEFAULT_ZUGEWIESEN = 'Constantin Seretoulis';
 
 // Pipeline stages — 5 steps shown as progress bar in LeadDetail
 export const PIPELINE_STAGES = [
