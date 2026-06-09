@@ -499,6 +499,8 @@ export default function LeadDetail() {
               />
             </CardContent>
           </Card>
+
+          <FragebogenSection lead={lead} />
         </motion.div>
       )}
 
