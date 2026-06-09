@@ -118,15 +118,20 @@ export default function KalenderPage() {
                         )}
                       </div>
                       <div className="space-y-1">
-                        {day.leads.slice(0, 2).map(lead => (
-                          <button
-                            key={lead.id}
-                            onClick={() => navigate(`/leads/${lead.id}`)}
-                            className="w-full text-left rounded-md px-1.5 py-1 text-[11px] font-medium truncate bg-primary/8 text-primary hover:bg-primary/15 transition-colors border border-primary/10"
-                          >
-                            {lead.vorname} {lead.nachname}
-                          </button>
-                        ))}
+                        {day.leads.slice(0, 2).map(lead => {
+                          const t = new Date(lead.termin_am!);
+                          const hhmm = t.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                          return (
+                            <button
+                              key={lead.id}
+                              onClick={() => navigate(`/leads/${lead.id}`)}
+                              className="w-full text-left rounded-md px-1.5 py-1 text-[11px] font-medium truncate bg-primary/8 text-primary hover:bg-primary/15 transition-colors border border-primary/10"
+                              title={`${hhmm} – ${lead.vorname} ${lead.nachname}`}
+                            >
+                              <span className="tabular-nums mr-1">{hhmm}</span>{lead.vorname} {lead.nachname}
+                            </button>
+                          );
+                        })}
                         {day.leads.length > 2 && (
                           <p className="text-[10px] text-muted-foreground pl-1">+{day.leads.length - 2} weitere</p>
                         )}
