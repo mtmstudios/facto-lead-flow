@@ -134,8 +134,33 @@ export default function LeadDetail() {
     deleteLead.mutate(lead.id, { onSuccess: () => navigate('/leads') });
   };
 
-  const InlineField = ({ label, field, value, type = 'text', placeholder }: { label: string; field: string; value: string | number | null; type?: string; placeholder?: string }) => {
+  const InlineField = ({ label, field, value, type = 'text', placeholder, stacked }: { label: string; field: string; value: string | number | null; type?: string; placeholder?: string; stacked?: boolean }) => {
     if (editField === field) {
+      if (stacked) {
+        return (
+          <div>
+            <span className="text-sm text-muted-foreground block mb-1.5">{label}</span>
+            <div className="flex items-center gap-2">
+              <Input
+                type={type}
+                value={editValue}
+                placeholder={placeholder}
+                onChange={e => setEditValue(e.target.value)}
+                className="h-8 text-sm flex-1"
+                autoFocus
+                onBlur={() => handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null);
+                  if (e.key === 'Escape') setEditField(null);
+                }}
+              />
+              <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => handleInlineEdit(field, type === 'number' ? Number(editValue) || null : editValue || null)}>
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+              </Button>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="flex items-center gap-2">
           <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
@@ -159,6 +184,40 @@ export default function LeadDetail() {
       );
     }
     const isUrl = field === 'homepage' && typeof value === 'string' && value;
+    if (stacked) {
+      return (
+        <div className="group">
+          <span
+            className="text-sm text-muted-foreground block mb-1.5 cursor-pointer"
+            onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+          >{label}</span>
+          {isUrl ? (
+            <div className="flex items-center gap-2">
+              <a
+                href={value as string}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                className="text-sm text-primary hover:underline truncate"
+              >
+                {value}
+              </a>
+              <button
+                onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+                className="text-xs text-muted-foreground hover:text-primary"
+              >Bearbeiten</button>
+            </div>
+          ) : (
+            <span
+              className="text-sm group-hover:text-primary transition-colors cursor-pointer"
+              onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+            >
+              {value || <span className="text-muted-foreground/40 italic">{placeholder || '–'}</span>}
+            </span>
+          )}
+        </div>
+      );
+    }
     return (
       <div className="flex items-center gap-2 group py-0.5">
         <span
@@ -580,8 +639,8 @@ export default function LeadDetail() {
                       />
                     </div>
                   )}
-                  <InlineField label="Entwicklungsaufwand (4 Jahre)" field="entwicklungsaufwand_4j" value={lead.entwicklungsaufwand_4j} placeholder="z. B. 500.000 €" />
-                  <InlineField label="MA in Entwicklung" field="ma_in_entwicklung" value={lead.ma_in_entwicklung} placeholder="z. B. 5" />
+                  <InlineField label="Entwicklungsaufwand (4 Jahre)" field="entwicklungsaufwand_4j" value={lead.entwicklungsaufwand_4j} placeholder="z. B. 500.000 €" stacked />
+                  <InlineField label="MA in Entwicklung" field="ma_in_entwicklung" value={lead.ma_in_entwicklung} placeholder="z. B. 5" stacked />
                 </div>
               </div>
             </CardContent>
