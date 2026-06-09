@@ -311,6 +311,9 @@ export default function LeadsPage() {
               <tr>
                 <th className="p-3 text-left"><SortHeader label="Status" sKey="status" /></th>
                 <th className="p-3 text-left"><SortHeader label="Firma / Name" sKey="unternehmen" /></th>
+                <th className="p-3 text-left hidden lg:table-cell">Homepage</th>
+                <th className="p-3 text-left hidden xl:table-cell">Zugewiesen</th>
+                <th className="p-3 text-left hidden lg:table-cell">Termin</th>
                 <th className="p-3 text-left"><SortHeader label="Quelle" sKey="quelle" /></th>
                 <th className="p-3 text-left"><SortHeader label="Erstellt" sKey="created_at" /></th>
               </tr>
@@ -348,6 +351,32 @@ export default function LeadsPage() {
                       )}
                     </div>
                   </td>
+                  <td className="p-3 text-xs hidden lg:table-cell max-w-[180px]" onClick={e => e.stopPropagation()}>
+                    {lead.homepage ? (
+                      <a
+                        href={lead.homepage}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline truncate inline-block max-w-full"
+                        title={lead.homepage}
+                      >
+                        {lead.homepage.replace(/^https?:\/\//, '')}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground/40">—</span>
+                    )}
+                  </td>
+                  <td className="p-3 hidden xl:table-cell" onClick={e => e.stopPropagation()}>
+                    <Select value={lead.zugewiesen_an || ''} onValueChange={v => handleQuickZugewiesenChange(lead.id, v)}>
+                      <SelectTrigger className="h-8 text-xs w-[170px]"><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectContent>
+                        {ZUGEWIESEN_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="p-3 text-muted-foreground text-xs hidden lg:table-cell whitespace-nowrap">
+                    {lead.termin_am ? formatDateTime(lead.termin_am) : <span className="text-muted-foreground/40">—</span>}
+                  </td>
                   <td className="p-3 text-muted-foreground text-xs">
                     {lead.quelle || '–'}
                   </td>
@@ -358,7 +387,7 @@ export default function LeadsPage() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-12 text-center text-muted-foreground">
+                  <td colSpan={7} className="p-12 text-center text-muted-foreground">
                     {hasActiveFilter ? 'Keine Leads gefunden' : 'Noch keine Leads'}
                   </td>
                 </tr>
