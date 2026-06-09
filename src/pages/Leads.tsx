@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, formatRelativeTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
+import { DROPDOWN_STATUSES, LEAD_QUELLEN, MITARBEITER_OPTIONS, ENTWICKLUNG_OPTIONS, ZUGEWIESEN_OPTIONS, DEFAULT_ZUGEWIESEN, formatRelativeTime, formatDateTime, isOverdue, berechnePrioritaet } from '@/lib/constants';
 import { Plus, Download, X, ChevronUp, ChevronDown, Search, ChevronRight, AlertTriangle, Trash2, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Textarea } from '@/components/ui/textarea';
