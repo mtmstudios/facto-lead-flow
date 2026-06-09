@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { motion } from 'framer-motion';
+import { FragebogenSection } from '@/components/FragebogenSection';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   'Anruf': PhoneCall, 'E-Mail': MailIcon, 'Notiz': FileText, 'Statusänderung': RotateCcw, 'Termin': Calendar, 'Fragenkatalog': FileText,
@@ -498,6 +499,8 @@ export default function LeadDetail() {
               />
             </CardContent>
           </Card>
+
+          <FragebogenSection lead={lead} />
         </motion.div>
       )}
 
