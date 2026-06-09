@@ -42,11 +42,27 @@ Deno.serve(async (req) => {
 
   try {
     const expectedKey = Deno.env.get("LEAD_INGEST_API_KEY");
-    if (expectedKey) {
-      const provided = req.headers.get("x-api-key") || req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-      if (provided !== expectedKey) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
+    const apiKey = req.headers.get("x-api-key");
+    const authHeader = req.headers.get("authorization") || "";
+    const bearer = authHeader.replace(/^Bearer\s+/i, "");
+
+    // Allow either: matching x-api-key, OR a valid Supabase JWT (authenticated dashboard user).
+    let authorized = false;
+    if (expectedKey && (apiKey === expectedKey || bearer === expectedKey)) {
+      authorized = true;
+    } else if (bearer) {
+      try {
+        const authClient = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_ANON_KEY")!,
+          { global: { headers: { Authorization: `Bearer ${bearer}` } } }
+        );
+        const { data, error } = await authClient.auth.getClaims(bearer);
+        if (!error && data?.claims?.sub) authorized = true;
+      } catch (_) { /* ignore */ }
+    }
+    if (!authorized) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const { lead_id } = await req.json();
