@@ -91,6 +91,24 @@ export function formatDateTime(dateStr: string | null): string {
   });
 }
 
+/** Convert ISO timestamp to value for <input type="datetime-local"> (local timezone, "YYYY-MM-DDTHH:MM"). */
+export function toDatetimeLocalInput(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Normalize a user-entered URL: prepend https:// if missing scheme. Returns null for empty. */
+export function normalizeUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export function isOverdue(lead: { status: string; created_at: string }): boolean {
   if (lead.status !== 'Neu') return false;
   const created = new Date(lead.created_at);
