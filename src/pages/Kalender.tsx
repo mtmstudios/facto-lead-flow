@@ -22,10 +22,12 @@ export default function KalenderPage() {
   const calendarDays = useMemo(() => {
     const days: { date: number; leads: typeof leadsWithTermin }[] = [];
     for (let i = 1; i <= daysInMonth; i++) {
-      const dayLeads = leadsWithTermin.filter(l => {
-        const d = new Date(l.termin_am!);
-        return d.getDate() === i && d.getMonth() === month && d.getFullYear() === year;
-      });
+      const dayLeads = leadsWithTermin
+        .filter(l => {
+          const d = new Date(l.termin_am!);
+          return d.getDate() === i && d.getMonth() === month && d.getFullYear() === year;
+        })
+        .sort((a, b) => new Date(a.termin_am!).getTime() - new Date(b.termin_am!).getTime());
       days.push({ date: i, leads: dayLeads });
     }
     return days;
