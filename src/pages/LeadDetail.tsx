@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ENTWICKLUNGSAUFWAND_OPTIONS, MA_ENTWICKLUNG_OPTIONS, ZUGEWIESEN_OPTIONS, formatCurrency, formatDateTime, toDatetimeLocalInput, normalizeUrl, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
+import { DROPDOWN_STATUSES, PIPELINE_STAGES, LEAD_PRIORITAETEN, AKTIVITAET_TYPEN, ZUGEWIESEN_OPTIONS, formatCurrency, formatDateTime, toDatetimeLocalInput, normalizeUrl, berechneFoerderfaehigkeit, FOERDERFAEHIGKEIT_LABELS, type Foerderfaehigkeit } from '@/lib/constants';
 import { ArrowLeft, Phone, Mail, Trash2, PhoneCall, MailIcon, FileText, RotateCcw, Calendar, Building2, Globe, MapPin, User, DollarSign, Clock, CheckCircle2, XCircle, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
