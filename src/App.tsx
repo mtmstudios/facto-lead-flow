@@ -10,6 +10,7 @@ import DashboardPage from "@/pages/Dashboard";
 import LeadsPage from "@/pages/Leads";
 import LeadDetail from "@/pages/LeadDetail";
 import PipelinePage from "@/pages/Pipeline";
+import Fragebogen from "@/pages/Fragebogen";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
