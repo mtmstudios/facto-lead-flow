@@ -19,6 +19,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/fragebogen/:token" element={<Fragebogen />} />
       <Route path="/*" element={
         <AppLayout>
           <Routes>
