@@ -475,9 +475,9 @@ export default function LeadDetail() {
                 </div>
                 <div className="mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-0 border-border/30">
                   <h3 className="text-sm font-bold mb-3">Vertrieb</h3>
-                  <InlineField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} />
-                  <InlineField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am ? new Date(lead.kontaktiert_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
-                  <InlineField label="Termin" field="termin_am" value={lead.termin_am ? new Date(lead.termin_am).toLocaleDateString('de-DE') : null} type="datetime-local" />
+                  <InlineSelectField label="Zugewiesen" field="zugewiesen_an" value={lead.zugewiesen_an} options={ZUGEWIESEN_OPTIONS} placeholder="Auswählen..." />
+                  <InlineDateTimeField label="Kontaktiert" field="kontaktiert_am" value={lead.kontaktiert_am} />
+                  <InlineDateTimeField label="Termin" field="termin_am" value={lead.termin_am} />
                   <InlineField label="Mandatswert" field="mandats_wert" value={lead.mandats_wert} type="number" />
                 </div>
               </div>
