@@ -639,8 +639,8 @@ export default function LeadDetail() {
                       />
                     </div>
                   )}
-                  <InlineField label="Entwicklungsaufwand (4 Jahre)" field="entwicklungsaufwand_4j" value={lead.entwicklungsaufwand_4j} placeholder="z. B. 500.000 €" />
-                  <InlineField label="MA in Entwicklung" field="ma_in_entwicklung" value={lead.ma_in_entwicklung} placeholder="z. B. 5" />
+                  <InlineField label="Entwicklungsaufwand (4 Jahre)" field="entwicklungsaufwand_4j" value={lead.entwicklungsaufwand_4j} placeholder="z. B. 500.000 €" stacked />
+                  <InlineField label="MA in Entwicklung" field="ma_in_entwicklung" value={lead.ma_in_entwicklung} placeholder="z. B. 5" stacked />
                 </div>
               </div>
             </CardContent>
