@@ -155,18 +155,69 @@ export default function LeadDetail() {
         </div>
       );
     }
+    const isUrl = field === 'homepage' && typeof value === 'string' && value;
     return (
-      <div
-        className="flex items-center gap-2 cursor-pointer group py-0.5"
-        onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
-      >
-        <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
-        <span className="text-sm group-hover:text-primary transition-colors truncate">
-          {value || <span className="text-muted-foreground/40 italic">–</span>}
-        </span>
+      <div className="flex items-center gap-2 group py-0.5">
+        <span
+          className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0 cursor-pointer"
+          onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+        >{label}</span>
+        {isUrl ? (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <a
+              href={value as string}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="text-sm text-primary hover:underline truncate"
+            >
+              {value}
+            </a>
+            <button
+              onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+              className="text-xs text-muted-foreground hover:text-primary"
+            >Bearbeiten</button>
+          </div>
+        ) : (
+          <span
+            className="text-sm group-hover:text-primary transition-colors truncate cursor-pointer flex-1"
+            onClick={() => { setEditField(field); setEditValue(String(value || '')); }}
+          >
+            {value || <span className="text-muted-foreground/40 italic">–</span>}
+          </span>
+        )}
       </div>
     );
   };
+
+  const InlineSelectField = ({ label, field, value, options, placeholder }: { label: string; field: string; value: string | null; options: readonly string[]; placeholder?: string }) => (
+    <div className="flex items-center gap-2 py-0.5">
+      <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
+      <Select value={value || ''} onValueChange={v => handleInlineEdit(field, v || null)}>
+        <SelectTrigger className="h-8 text-sm flex-1"><SelectValue placeholder={placeholder || '–'} /></SelectTrigger>
+        <SelectContent>
+          {options.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const InlineDateTimeField = ({ label, field, value }: { label: string; field: string; value: string | null }) => (
+    <div className="flex items-center gap-2 py-0.5">
+      <span className="text-xs md:text-sm text-muted-foreground w-20 md:w-28 shrink-0">{label}</span>
+      <Input
+        type="datetime-local"
+        value={toDatetimeLocalInput(value)}
+        onChange={e => handleDateTimeChange(field, e.target.value)}
+        className="h-8 text-sm flex-1"
+      />
+      {value && (
+        <span className="text-xs text-muted-foreground whitespace-nowrap hidden sm:inline">
+          {formatDateTime(value)}
+        </span>
+      )}
+    </div>
+  );
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'uebersicht', label: 'Übersicht' },
